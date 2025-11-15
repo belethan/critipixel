@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Doctrine\DataFixtures;
+namespace App\Legacy\Fixtures;
 
 use App\Model\Entity\User;
 use App\Model\Entity\VideoGame;
@@ -11,7 +11,6 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Generator;
-
 use function array_fill_callback;
 
 final class VideoGameFixtures extends Fixture implements DependentFixtureInterface

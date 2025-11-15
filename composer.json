@@ -11,44 +11,37 @@
     "ext-intl": "*",
     "ext-mbstring": "*",
     "ext-pgsql": "*",
-
-    "doctrine/dbal": "^3",
-    "doctrine/doctrine-bundle": "^2.12",
-    "doctrine/doctrine-migrations-bundle": "^3.3",
+    "doctrine/dbal": "^3.10.3",
+    "doctrine/doctrine-bundle": "^2.18.1",
+    "doctrine/doctrine-migrations-bundle": "^3.6.0",
     "doctrine/orm": "^3.1",
-
-    "phpdocumentor/reflection-docblock": "^5.4",
+    "phpdocumentor/reflection-docblock": "^5.6.3",
     "phpstan/phpdoc-parser": "^1.28",
-
-    "stof/doctrine-extensions-bundle": "^1.10",
-
+    "stof/doctrine-extensions-bundle": "^1.14.0",
+    "symfony/asset": "^7.3",
     "symfony/asset-mapper": "^7.3",
     "symfony/flex": "^2",
-    "symfony/form": "^7.3",
+    "symfony/form": "7.3.6.*",
+    "symfony/framework-bundle": "^7.3",
     "symfony/http-client": "^7.3",
     "symfony/property-access": "^7.3",
     "symfony/property-info": "^7.3",
     "symfony/runtime": "^7.3",
-    "symfony/ux-twig-component": "^2.14",
-    "symfony/web-link": "^7.3",
-
-    "symfony/translation": "^7.3",
-    "symfony/translation-contracts": "^3",
-
-    "symfony/asset": "^7.3",
+    "symfony/security-csrf": "7.3.*",
     "symfony/serializer": "^7.3",
     "symfony/string": "^7.3",
+    "symfony/translation": "^7.3",
+    "symfony/translation-contracts": "^3.6.1",
+    "symfony/ux-twig-component": "^2.31.0",
+    "symfony/validator": "7.3.*",
+    "symfony/web-link": "^7.3",
     "symfony/yaml": "^7.3",
-    "symfony/framework-bundle": "^7.3",
-
-    "twbs/bootstrap": "^5.3",
-    "twig/extra-bundle": "^3.12",
-    "twig/string-extra": "^3.9",
-    "twig/twig": "^3.12",
-
-    "vich/uploader-bundle": "^2.3",
-
-    "symfonycasts/sass-bundle": "^0.7"
+    "symfonycasts/sass-bundle": "^0.7",
+    "twbs/bootstrap": "^5.3.8",
+    "twig/extra-bundle": "^3.22",
+    "twig/string-extra": "^3.22",
+    "twig/twig": "^3.22",
+    "vich/uploader-bundle": "^2.8"
   },
 
   "config": {
@@ -125,23 +118,21 @@
   },
 
   "require-dev": {
-    "doctrine/doctrine-fixtures-bundle": "^3.5",
+    "doctrine/doctrine-fixtures-bundle": "^4.3",
     "fakerphp/faker": "^1.23",
-
     "phpunit/phpunit": "^10.5",
-    "symfony/phpunit-bridge": "^7.0",
-
     "symfony/asset": "^7.3",
     "symfony/browser-kit": "^7.3",
     "symfony/console": "^7.3",
     "symfony/css-selector": "^7.3",
     "symfony/debug-bundle": "^7.3",
     "symfony/dotenv": "^7.3",
+    "symfony/framework-bundle": "^7.3",
     "symfony/http-foundation": "^7.3",
     "symfony/http-kernel": "^7.3",
-    "symfony/framework-bundle": "^7.3",
     "symfony/maker-bundle": "^1.58",
     "symfony/monolog-bundle": "^3.0",
+    "symfony/phpunit-bridge": "^7.0",
     "symfony/routing": "^7.3",
     "symfony/security-bundle": "^7.3",
     "symfony/serializer": "^7.3",
@@ -149,7 +140,6 @@
     "symfony/string": "^7.3",
     "symfony/translation": "^7.3",
     "symfony/twig-bundle": "^7.3",
-    "symfony/validator": "^7.3",
     "symfony/web-profiler-bundle": "^7.3",
     "symfony/yaml": "^7.3"
   }

@@ -23,7 +23,7 @@ use Traversable;
 final class VideoGamesList implements Countable, IteratorAggregate
 {
     private FormView $form;
-    
+
     private Filter $filter;
 
     /**
@@ -61,7 +61,7 @@ final class VideoGamesList implements Countable, IteratorAggregate
                 $this->filter,
                 [
                     'method' => Request::METHOD_GET,
-                    'csrf_protection' => false,
+                    //'csrf_protection' => false,
                 ]
             )
             ->handleRequest($request)

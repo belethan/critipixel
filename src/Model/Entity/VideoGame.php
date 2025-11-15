@@ -1,93 +1,64 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Model\Entity;
 
 use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Embedded;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\GeneratedValue;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\JoinTable;
-use Doctrine\ORM\Mapping\ManyToMany;
-use Doctrine\ORM\Mapping\OneToMany;
-use Gedmo\Mapping\Annotation\Slug;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Range;
-use Vich\UploaderBundle\Mapping\Annotation\Uploadable;
-use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
+use Doctrine\ORM\Mapping as ORM;
 
-#[Entity]
-#[UniqueEntity('slug')]
-#[Uploadable]
+#[ORM\Entity]
 class VideoGame
 {
-    #[Id]
-    #[GeneratedValue]
-    #[Column]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    #[NotBlank]
-    #[Length(max: 100)]
-    #[Column(length: 100)]
+    #[ORM\Column(type: "string", length: 100)]
     private string $title;
 
-    #[Column(nullable: true)]
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $imageName = null;
 
-    #[Column(nullable: true)]
+    #[ORM\Column(type: "integer", nullable: true)]
     private ?int $imageSize = null;
 
-    #[UploadableField(mapping: 'video_games', fileNameProperty: 'imageName', size: 'imageSize')]
-    private ?File $imageFile = null;
-
-    #[Column(unique: true)]
-    #[Slug(fields: ['title'])]
+    #[ORM\Column(type: "string", length: 255, unique: true)]
     private string $slug;
 
-    #[NotBlank]
-    #[Column(type: Types::TEXT)]
+    #[ORM\Column(type: "text")]
     private string $description;
 
-    #[Column(type: Types::DATE_IMMUTABLE)]
-    private DateTimeInterface $releaseDate;
+    #[ORM\Column(type: "date_immutable")]
+    private DateTimeImmutable $releaseDate;
 
-    #[Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private DateTimeImmutable $updatedAt;
+    #[ORM\Column(type: "datetime_immutable", nullable: true)]
+    private ?DateTimeImmutable $updatedAt = null;
 
-    #[Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: "text", nullable: true)]
     private ?string $test = null;
 
-    #[Range(min: 1, max: 5)]
-    #[Column(nullable: true)]
+    #[ORM\Column(type: "integer", nullable: true)]
     private ?int $rating = null;
 
-    #[Column(nullable: true)]
+    #[ORM\Column(type: "integer", nullable: true)]
     private ?int $averageRating = null;
 
-    #[Embedded(class: NumberOfRatingPerValue::class, columnPrefix: '')]
+    #[ORM\Embedded(class: NumberOfRatingPerValue::class, columnPrefix: false)]
     private NumberOfRatingPerValue $numberOfRatingsPerValue;
 
     /**
-     * @var Collection<Tag>
+     * @var Collection<int, Tag>
      */
-    #[ManyToMany(targetEntity: Tag::class)]
-    #[JoinTable(name: 'video_game_tags')]
+    #[ORM\ManyToMany(targetEntity: Tag::class)]
+    #[ORM\JoinTable(name: 'video_game_tags')]
     private Collection $tags;
 
     /**
-     * @var Collection<Review>
+     * @var Collection<int, Review>
      */
-    #[OneToMany(targetEntity: Review::class, mappedBy: 'videoGame')]
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'videoGame', cascade: ['persist', 'remove'])]
     private Collection $reviews;
 
     public function __construct()
@@ -98,141 +69,113 @@ class VideoGame
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    /* ============================================================
+       GETTERS / SETTERS
+       ============================================================ */
 
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function setTitle(string $title): VideoGame
-    {
-        $this->title = $title;
-        return $this;
-    }
+    public function getTitle(): string { return $this->title; }
+    public function setTitle(string $title): self { $this->title = $title; return $this; }
 
-    public function getSlug(): string
-    {
-        return $this->slug;
-    }
+    public function getImageName(): ?string { return $this->imageName; }
+    public function setImageName(?string $imageName): self { $this->imageName = $imageName; return $this; }
 
-    public function setImageFile(?File $imageFile = null): void
-    {
-        $this->imageFile = $imageFile;
+    public function getImageSize(): ?int { return $this->imageSize; }
+    public function setImageSize(?int $imageSize): self { $this->imageSize = $imageSize; return $this; }
 
-        if (null !== $imageFile) {
-            $this->updatedAt = new DateTimeImmutable();
+    public function getSlug(): string { return $this->slug; }
+    public function setSlug(string $slug): self { $this->slug = $slug; return $this; }
+
+    public function getDescription(): string { return $this->description; }
+    public function setDescription(string $description): self { $this->description = $description; return $this; }
+
+    public function getReleaseDate(): DateTimeImmutable { return $this->releaseDate; }
+    public function setReleaseDate(DateTimeImmutable $date): self { $this->releaseDate = $date; return $this; }
+
+    public function getUpdatedAt(): ?DateTimeImmutable { return $this->updatedAt; }
+    public function setUpdatedAt(?DateTimeImmutable $date): self { $this->updatedAt = $date; return $this; }
+
+    public function getTest(): ?string { return $this->test; }
+    public function setTest(?string $test): self { $this->test = $test; return $this; }
+
+    public function getRating(): ?int { return $this->rating; }
+    public function setRating(?int $rating): self { $this->rating = $rating; return $this; }
+
+    public function getAverageRating(): float
+    {
+        if ($this->reviews->isEmpty()) {
+            return 0.0;
         }
-    }
 
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
-    }
+        $sum = 0;
 
-    public function setImageName(?string $imageName): VideoGame
-    {
-        $this->imageName = $imageName;
-        return $this;
-    }
+        foreach ($this->reviews as $review) {
+            $sum += $review->getRating();
+        }
 
-    public function getImageName(): ?string
-    {
-        return $this->imageName;
+        return round($sum / count($this->reviews), 1);
     }
-
-    public function setImageSize(?int $imageSize): VideoGame
-    {
-        $this->imageSize = $imageSize;
-        return $this;
-    }
-
-    public function getImageSize(): ?int
-    {
-        return $this->imageSize;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): VideoGame
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    public function getReleaseDate(): DateTimeInterface
-    {
-        return $this->releaseDate;
-    }
-
-    public function setReleaseDate(DateTimeInterface $releaseDate): VideoGame
-    {
-        $this->releaseDate = $releaseDate;
-        return $this;
-    }
-
-    public function getTest(): ?string
-    {
-        return $this->test;
-    }
-
-    public function setTest(?string $test): VideoGame
-    {
-        $this->test = $test;
-        return $this;
-    }
-
-    public function getRating(): ?int
-    {
-        return $this->rating;
-    }
-
-    public function setRating(?int $rating): VideoGame
-    {
-        $this->rating = $rating;
-        return $this;
-    }
-
-    public function getAverageRating(): ?int
-    {
-        return $this->averageRating;
-    }
-
-    public function setAverageRating(?int $averageRating): VideoGame
-    {
-        $this->averageRating = $averageRating;
-        return $this;
-    }
+    public function setAverageRating(?int $avg): self { $this->averageRating = $avg; return $this; }
 
     public function getNumberOfRatingsPerValue(): NumberOfRatingPerValue
     {
         return $this->numberOfRatingsPerValue;
     }
 
-    /**
-     * @return Collection<Tag>
-     */
-    public function getTags(): Collection
+    /* ============================================================
+       TAGS (ManyToMany)
+       ============================================================ */
+
+    public function getTags(): Collection { return $this->tags; }
+
+    public function addTag(Tag $tag): self
     {
-        return $this->tags;
+        if (!$this->tags->contains($tag)) {
+            $this->tags->add($tag);
+        }
+        return $this;
     }
 
-    /**
-     * @return Collection<Review>
-     */
-    public function getReviews(): Collection
+    public function removeTag(Tag $tag): self
     {
-        return $this->reviews;
+        $this->tags->removeElement($tag);
+        return $this;
     }
 
-    public function hasAlreadyReview(User $user): bool
+    /* ============================================================
+       REVIEWS (OneToMany)
+       ============================================================ */
+
+    public function getReviews(): Collection { return $this->reviews; }
+
+    public function addReview(Review $review): self
     {
-        return $this->reviews->exists(static fn (int $key, Review $review): bool => $review->getUser() === $user);
+        if (!$this->reviews->contains($review)) {
+
+            // Ajout à la collection de reviews
+            $this->reviews->add($review);
+
+            // Liaison inverse : Review → VideoGame
+            $review->setVideoGame($this);
+
+            // Mise à jour du nombre de votes par valeur
+            $rating = $review->getRating();
+            if ($rating !== null) {
+                $this->numberOfRatingsPerValue->increment($rating);
+            }
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): self
+    {
+        if ($this->reviews->removeElement($review)) {
+            if ($review->getVideoGame() === $this) {
+                $review->setVideoGame(null);
+            }
+        }
+        return $this;
     }
 }

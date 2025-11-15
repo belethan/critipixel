@@ -9,16 +9,19 @@ services:
         resource: '../src/'
         exclude:
             - '../src/DependencyInjection/'
-            - '../src/Model/'
+            - '../src/Legacy/'
             - '../src/Kernel.php'
 
+    # Faker
     Faker\Generator:
         factory: ['App\Faker\FrenchGeneratorFactory', 'create']
 
+    # User Listener
     App\Doctrine\EntityListener\UserListener:
         tags:
             - { name: doctrine.orm.entity_listener }
 
+    # Gedmo Sluggable
     gedmo.listener.sluggable:
         class: Gedmo\Sluggable\SluggableListener
         tags:

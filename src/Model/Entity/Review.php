@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 
 #[Entity]
@@ -29,9 +30,10 @@ class Review
     #[JoinColumn(nullable: false)]
     private User $user;
 
+    #[NotNull]
     #[Range(min: 1, max: 5)]
     #[Column]
-    private int $rating;
+    private ?int $rating;
 
     #[Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
@@ -68,7 +70,7 @@ class Review
         return $this->rating;
     }
 
-    public function setRating(int $rating): Review
+    public function setRating(?int $rating): Review
     {
         $this->rating = $rating;
         return $this;

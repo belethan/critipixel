@@ -5,52 +5,52 @@ declare(strict_types=1);
 namespace App\Model\Entity;
 
 use App\Doctrine\EntityListener\UserListener;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\EntityListeners;
-use Doctrine\ORM\Mapping\GeneratedValue;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NoSuspiciousCharacters;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
-use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[Entity]
-#[Table('`user`')]
-#[UniqueEntity('email')]
-#[UniqueEntity('username')]
-#[EntityListeners([UserListener::class])]
+#[ORM\Entity]
+#[ORM\Table(name: '`user`')]
+#[ORM\EntityListeners([UserListener::class])]
+
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'Cet email est déjà utilisé.'
+)]
+#[UniqueEntity(
+    fields: ['username'],
+    message: 'Ce pseudo est déjà utilisé.'
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[Id]
-    #[GeneratedValue]
-    #[Column]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
     private ?int $id = null;
 
-    #[NotBlank]
-    #[Length(max: 30)]
-    #[Column(length: 30, unique: true)]
+    #[Assert\NotBlank(message: 'Pseudo obligatoire')]
+    #[Assert\Length(
+        max: 30,
+        maxMessage: 'Le pseudo ne peut pas dépasser 30 caractères'
+    )]
+    #[ORM\Column(length: 30, unique: true)]
     private string $username;
 
-    #[NotBlank]
-    #[Email]
-    #[NoSuspiciousCharacters]
-    #[Column(unique: true)]
+    #[Assert\NotBlank(message: 'Email obligatoire')]
+    #[Assert\Email(message: 'Email invalide')]
+    #[ORM\Column(unique: true)]
     private string $email;
 
-    #[Column(length: 60)]
+    #[ORM\Column(length: 60)]
     private string $password;
 
-    #[NotBlank]
-    #[NotCompromisedPassword]
-    #[PasswordStrength]
     private ?string $plainPassword = null;
+
+    // ---------------------------------------------------
+    // Getters / Setters
+    // ---------------------------------------------------
 
     public function getId(): ?int
     {
@@ -62,7 +62,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username;
     }
 
-    public function setUsername(string $username): User
+    public function setUsername(string $username): self
     {
         $this->username = $username;
         return $this;
@@ -73,7 +73,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): User
+    public function setEmail(string $email): self
     {
         $this->email = $email;
         return $this;
@@ -84,7 +84,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): User
+    public function setPassword(string $password): self
     {
         $this->password = $password;
         return $this;
@@ -95,11 +95,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->plainPassword;
     }
 
-    public function setPlainPassword(?string $plainPassword): User
+    public function setPlainPassword(?string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
         return $this;
     }
+
+    // ---------------------------------------------------
+    // Security
+    // ---------------------------------------------------
 
     public function getRoles(): array
     {

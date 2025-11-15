@@ -26,20 +26,37 @@ final class AuthController extends AbstractController
         ]);
     }
 
-    #[Route('/register', name: 'register', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/register', name: 'register', methods: ['GET','POST'])]
     public function register(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
+        $form = $this->createForm(RegisterType::class, $user);
+        $form->handleRequest($request);
 
-        $form = $this->createForm(RegisterType::class, $user)->handleRequest($request);
+        // Cas 1 : formulaire soumis NON valide -> renvoie 422
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return $this->render('views/auth/register.html.twig', [
+                'form' => $form,
+            ], new Response('', 422));
+        }
 
+        // Cas 2 : formulaire soumis ET valide -> on persiste
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // Récupérer le mot de passe car mapped=false dans RegisterType
+            $plainPassword = $form->get('plainPassword')->getData();
+            $user->setPlainPassword($plainPassword);
+            // Doctrine + UserListener vont générer le password hashé
             $entityManager->persist($user);
             $entityManager->flush();
-            $this->addFlash('success', 'Inscription réussie. Vous pouvez vous connecter !');
+
             return $this->redirectToRoute('auth_login');
         }
 
-        return $this->render('views/auth/register.html.twig', ['form' => $form]);
+        // Cas 3 : simple GET
+        return $this->render('views/auth/register.html.twig', [
+            'form' => $form,
+        ]);
     }
+
 }

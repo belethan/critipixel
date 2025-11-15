@@ -39,6 +39,10 @@ final class FilterType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('data_class', Filter::class);
+        //$resolver->setDefault('data_class', Filter::class);
+        $resolver->setDefaults([
+            'method' => 'GET',
+            'data_class' => Filter::class // obligatoire pour éviter les erreurs
+        ]);
     }
 }

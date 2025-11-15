@@ -5,23 +5,35 @@ declare(strict_types=1);
 namespace App\Doctrine\EntityListener;
 
 use App\Model\Entity\User;
-use Doctrine\ORM\Mapping\PrePersist;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-final readonly class UserListener
+class UserListener
 {
-    public function __construct(private UserPasswordHasherInterface $passwordHasher)
+    public function __construct(
+        private UserPasswordHasherInterface $passwordHasher
+    ) {}
+
+    public function prePersist(User $user): void
     {
+        $plain = $user->getPlainPassword();
+
+        if (!empty($plain)) {
+            $hashed = $this->passwordHasher->hashPassword($user, $plain);
+            $user->setPassword($hashed);
+        }
     }
 
-    #[PrePersist]
-    public function hashPassword(User $user): void
+    public function preUpdate(User $user, PreUpdateEventArgs $event): void
     {
-        $user->setPassword(
-            $this->passwordHasher->hashPassword(
-                $user,
-                $user->getPlainPassword()
-            )
-        );
+        $plain = $user->getPlainPassword();
+
+        if (!empty($plain)) {
+            $hashed = $this->passwordHasher->hashPassword($user, $plain);
+            $user->setPassword($hashed);
+
+            // force Doctrine à mettre à jour le champ
+            $event->setNewValue('password', $hashed);
+        }
     }
 }

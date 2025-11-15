@@ -1,25 +1,34 @@
-# see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
-    #csrf_protection: true
     annotations: false
     http_method_override: false
     handle_all_throwables: true
 
-    # Enables session support. Note that the session will ONLY be started if you read or write from it.
-    # Remove or comment this section to explicitly disable session support.
+    validation:
+        enabled: true
+
     session:
         handler_id: null
         cookie_secure: auto
         cookie_samesite: lax
 
-    #esi: true
-    #fragments: true
     php_errors:
         log: true
 
 when@test:
     framework:
         test: true
+
+        # ➜ C’est ça qui manque !
+        validation:
+            enabled: true
+            enable_attributes: true   # ← OBLIGATOIRE en environnement test
+
         session:
             storage_factory_id: session.storage.factory.mock_file
+
+        # Débug non masqué pendant PHPUnit
+        error_controller: null
+
+    twig:
+        exception_controller: null
