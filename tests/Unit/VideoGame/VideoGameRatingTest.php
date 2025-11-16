@@ -15,42 +15,49 @@ class VideoGameRatingTest extends TestCase
         return $review;
     }
 
-    public function testAverageWithMultipleRatings(): void
+    public function testRatingDistribution(): void
     {
         $game = new VideoGame();
+
         $game->addReview($this->createReview(3));
         $game->addReview($this->createReview(4));
         $game->addReview($this->createReview(5));
 
-        // (3 + 4 + 5) / 3 = 4
-        $this->assertSame(4.0, $game->getAverageRating());
+        $stats = $game->getNumberOfRatingsPerValue();
+
+        $this->assertSame(0, $stats->getNumberOfOne());
+        $this->assertSame(0, $stats->getNumberOfTwo());
+        $this->assertSame(1, $stats->getNumberOfThree());
+        $this->assertSame(1, $stats->getNumberOfFour());
+        $this->assertSame(1, $stats->getNumberOfFive());
     }
 
-    public function testAverageWithOneRating(): void
-    {
-        $game = new VideoGame();
-        $game->addReview($this->createReview(2));
-
-        $this->assertSame(2.0, $game->getAverageRating());
-    }
-
-    public function testAverageWithNoRating(): void
+    public function testAverageIsNullBecauseItIsNotCalculatedInEntity(): void
     {
         $game = new VideoGame();
 
-        // Selon ton implémentation : null, 0.0, ou 0
-        // Ici on part du principe que la moyenne = 0.0
-        $this->assertSame(0.0, $game->getAverageRating());
-    }
-
-    public function testAverageWithExtremeValues(): void
-    {
-        $game = new VideoGame();
-        $game->addReview($this->createReview(1));
+        $game->addReview($this->createReview(3));
         $game->addReview($this->createReview(5));
 
-        // (1 + 5) / 2 = 3
-        $this->assertSame(3.0, $game->getAverageRating());
+        // La moyenne n'est PLUS calculée automatiquement dans l'entité
+        $this->assertNull(
+            $game->getAverageRating(),
+            'La moyenne doit être NULL tant que RatingHandler ne l’a pas calculée.'
+        );
+    }
+
+    public function testDistributionWithNoRating(): void
+    {
+        $game = new VideoGame();
+        $stats = $game->getNumberOfRatingsPerValue();
+
+        $this->assertSame(0, $stats->getNumberOfOne());
+        $this->assertSame(0, $stats->getNumberOfTwo());
+        $this->assertSame(0, $stats->getNumberOfThree());
+        $this->assertSame(0, $stats->getNumberOfFour());
+        $this->assertSame(0, $stats->getNumberOfFive());
+
+        // Toujours null car non calculé par l'entité
+        $this->assertNull($game->getAverageRating());
     }
 }
-
