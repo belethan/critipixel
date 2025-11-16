@@ -6,7 +6,6 @@ use App\Model\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use App\Faker\FrenchGeneratorFactory;
 
 class UserFixtures extends Fixture
 {
@@ -19,23 +18,33 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $faker = FrenchGeneratorFactory::create();
+        // ====== UTILISATEURS STANDARD ======
+        for ($i = 0; $i < 5; $i++) {
 
-        // 2 utilisateurs
-        for ($i = 1; $i <= 2; $i++) {
             $user = new User();
-            $user->setEmail($faker->unique()->email());
-            $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
-            $user->setUsername($faker->unique()->userName());
+
+            $username = "user{$i}";
+            $email = "user+{$i}@email.com";
+
+            $user->setUsername($username);
+            $user->setEmail($email);
+            $user->setPassword(
+                $this->passwordHasher->hashPassword($user, 'password')
+            );
+
             $manager->persist($user);
-            $this->addReference(self::USER_REF.$i, $user);
+
+            // Permet d’utiliser les références dans les autres fixtures
+            $this->addReference(self::USER_REF . $i, $user);
         }
 
-        // 1 administrateur
+        // ====== ADMIN ======
         $admin = new User();
-        $admin->setUsername('admin');    // ✔ AJOUT CRUCIAL
+        $admin->setUsername('admin');
         $admin->setEmail('admin@mail.com');
-        $admin->setPassword($this->passwordHasher->hashPassword($admin, 'adminpass'));
+        $admin->setPassword(
+            $this->passwordHasher->hashPassword($admin, 'adminpass')
+        );
 
         $manager->persist($admin);
         $this->addReference(self::ADMIN_REF, $admin);
@@ -43,4 +52,3 @@ class UserFixtures extends Fixture
         $manager->flush();
     }
 }
-

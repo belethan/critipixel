@@ -6,8 +6,12 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation\Uploadable;
+use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
 
 #[ORM\Entity]
+#[Uploadable]
 class VideoGame
 {
     #[ORM\Id]
@@ -18,11 +22,14 @@ class VideoGame
     #[ORM\Column(type: "string", length: 100)]
     private string $title;
 
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: "image_name", type: "string", length: 255, nullable: true)]
     private ?string $imageName = null;
 
-    #[ORM\Column(type: "integer", nullable: true)]
+    #[ORM\Column(name: "image_size", type: "integer", nullable: true)]
     private ?int $imageSize = null;
+
+    #[UploadableField(mapping: 'video_games', fileNameProperty: 'imageName', size: 'imageSize')]
+    private ?File $imageFile = null;
 
     #[ORM\Column(type: "string", length: 255, unique: true)]
     private string $slug;
@@ -102,21 +109,34 @@ class VideoGame
     public function getRating(): ?int { return $this->rating; }
     public function setRating(?int $rating): self { $this->rating = $rating; return $this; }
 
-    public function getAverageRating(): float
+    public function setImageFile(?File $imageFile = null): void
     {
-        if ($this->reviews->isEmpty()) {
-            return 0.0;
+        $this->imageFile = $imageFile;
+
+        if ($imageFile !== null) {
+            $this->updatedAt = new DateTimeImmutable();
         }
-
-        $sum = 0;
-
-        foreach ($this->reviews as $review) {
-            $sum += $review->getRating();
-        }
-
-        return round($sum / count($this->reviews), 1);
     }
-    public function setAverageRating(?int $avg): self { $this->averageRating = $avg; return $this; }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    /**
+    * On NE calcule PLUS la moyenne ici.
+    * On retourne UNIQUEMENT la valeur calculée par RatingHandler.
+    */
+    public function getAverageRating(): ?int
+    {
+        return $this->averageRating;
+    }
+
+    public function setAverageRating(?int $avg): self
+    {
+        $this->averageRating = $avg;
+        return $this;
+    }
 
     public function getNumberOfRatingsPerValue(): NumberOfRatingPerValue
     {
@@ -177,5 +197,20 @@ class VideoGame
             }
         }
         return $this;
+    }
+
+    public function hasAlreadyReview(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        foreach ($this->reviews as $review) {
+            if ($review->getUser() === $user) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

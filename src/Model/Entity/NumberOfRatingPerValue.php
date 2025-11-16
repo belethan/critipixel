@@ -54,4 +54,14 @@ class NumberOfRatingPerValue
     public function getNumberOfThree(): int { return $this->numberOfThree; }
     public function getNumberOfFour(): int { return $this->numberOfFour; }
     public function getNumberOfFive(): int { return $this->numberOfFive; }
+
+    public function clear(): void
+    {
+        $this->numberOfOne   = 0;
+        $this->numberOfTwo   = 0;
+        $this->numberOfThree = 0;
+        $this->numberOfFour  = 0;
+        $this->numberOfFive  = 0;
+    }
+
 }

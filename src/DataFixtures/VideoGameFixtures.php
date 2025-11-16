@@ -5,55 +5,43 @@ namespace App\DataFixtures;
 use App\Model\Entity\VideoGame;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use App\Faker\FrenchGeneratorFactory;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class VideoGameFixtures extends Fixture
 {
     public const GAME_REF = 'game-';
 
-    public function __construct(
-        private SluggerInterface $slugger
-    ) {
-    }
-
     public function load(ObjectManager $manager): void
     {
-        $faker = FrenchGeneratorFactory::create();
+        $basePath = __DIR__ . '/../../public/images/video_games';
 
-        $games = [
-            'Zelda Breath of the Wild',
-            'Horizon Zero Dawn',
-            'The Witcher 3',
-            'Cyberpunk 2077',
-            'Super Mario Odyssey',
-            'God of War',
-            'Elden Ring',
-            'Halo Infinite',
-            'Minecraft',
-            'Fortnite',
-        ];
-
-        foreach ($games as $i => $title) {
+        for ($i = 0; $i < 50; $i++) {
 
             $game = new VideoGame();
-            $game->setTitle($title);
-            $game->setDescription($faker->paragraph(3));
 
-            // Génération du slug OBLIGATOIRE
-            $slug = $this->slugger->slug($title)->lower();
+            $title = "Jeu Vidéo {$i}";
+            $slug  = "jeu-video-{$i}";
+
+            // Nom attendu du fichier
+            $fileName = "video_game_{$i}.png";
+            $filePath = $basePath . '/' . $fileName;
+
+            // Taille du fichier si présent
+            $imageSize = file_exists($filePath) ? filesize($filePath) : null;
+
+            $game->setTitle($title);
+            $game->setDescription("Description du jeu vidéo numéro {$i}");
             $game->setSlug($slug);
 
-            // Release date IMMUTABLE
-            $dateMutable = $faker->dateTimeBetween('-10 years', 'now');
-            $releaseDate = new \DateTimeImmutable($dateMutable->format('Y-m-d'));
-            $game->setReleaseDate($releaseDate);
+            // Date fictive valide
+            $game->setReleaseDate(new \DateTimeImmutable('2020-01-01'));
 
-            // Stats embeddable → auto initialisé dans l'entité VideoGame
-            // Aucune action nécessaire ici
+            //on fixe imageName AVEC l’extension
+            $game->setImageName($fileName);
+            $game->setImageSize($imageSize);
 
             $manager->persist($game);
-            $this->addReference(self::GAME_REF . ($i + 1), $game);
+
+            $this->addReference(self::GAME_REF . $i, $game);
         }
 
         $manager->flush();

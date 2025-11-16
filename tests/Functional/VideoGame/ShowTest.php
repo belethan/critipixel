@@ -4,15 +4,23 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\VideoGame;
 
-use App\Tests\Functional\FunctionalTestCase;
-use Symfony\Component\HttpFoundation\Response;
+use App\Model\Entity\VideoGame;
 
-final class ShowTest extends FunctionalTestCase
+final class ShowTest extends WebTestBase
 {
     public function testShouldShowVideoGame(): void
     {
-        $this->get('/jeu-video-0');
+        // Récupérer un jeu existant
+        $game = $this->em->getRepository(VideoGame::class)->findOneBy([]);
+        self::assertNotNull($game, 'Aucun jeu en base de test.');
+
+        // Accéder à la page via le slug réel
+        $this->get('/' . $game->getSlug());
+
+        // Vérifier que la page charge correctement
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h1', 'Jeu vidéo 0');
+
+        // Vérifier que <h1> contient le vrai titre
+        self::assertSelectorTextContains('h1', $game->getTitle());
     }
 }

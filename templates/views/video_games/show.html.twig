@@ -2,51 +2,74 @@
 
 {% block body %}
     <div class="container">
+
+        {# ==== HEADER JEU ==== #}
         <div class="row mb-4">
             <div class="col">
                 <div class="rounded-5 bg-light p-4 d-flex flex-column align-items-center">
                     <h1 class="mb-4 text-center text-uppercase">{{ video_game.title }}</h1>
+
                     <div class="tags d-flex justify-content-center gap-3 mb-3">
                         {% for tag in video_game.tags %}
                             <span class="badge bg-primary">{{ tag.name }}</span>
                         {% endfor %}
                     </div>
-                    <small class="text-muted">Sortie: {{ video_game.releaseDate|date('m/d/Y') }}</small>
+
+                    <small class="text-muted">
+                        Sortie: {{ video_game.releaseDate|date('d/m/Y') }}
+                    </small>
                 </div>
             </div>
         </div>
+
         <div class="row">
+
+            {# ==== Colonne image + stats ==== #}
             <div class="col-md-4">
-                <img src="{{ vich_uploader_asset(video_game, 'imageFile', 'App\\Model\\Entity\\VideoGame') }}" class="img-fluid rounded" alt="Couverture de {{ video_game.title|e }}">
+
+                {# Image du jeu #}
+                <img src="{{ asset('images/video_games/' ~ (video_game.imageName ?? 'default.png')) }}"
+                     class="img-fluid rounded"
+                     alt="Couverture de {{ video_game.title }}">
+
+                {# Notes #}
                 <div class="ratings justify-content-between mt-3">
-                    <twig:Rating rating="{{ video_game.rating }}" label="Test" />
+                    <twig:Rating rating="{{ video_game.rating ?? 0 }}" label="Test" />
+
                     {% if video_game.averageRating is not null %}
                         <twig:Rating rating="{{ video_game.averageRating }}" label="Avis" />
                     {% endif %}
                 </div>
+
+                {# Distribution des notes #}
                 <div class="mt-4">
                     <h2 class="text-uppercase">Notes ({{ video_game.reviews|length }})</h2>
+
                     <ul class="d-flex flex-column gap-2 p-0">
                         <li class="d-flex gap-2 align-items-center">
                             <span>5/5</span>
                             {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfFive }) }}
                             <span>{{ video_game.numberOfRatingsPerValue.numberOfFive }}</span>
                         </li>
+
                         <li class="d-flex gap-2 align-items-center">
                             <span>4/5</span>
                             {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfFour }) }}
                             <span>{{ video_game.numberOfRatingsPerValue.numberOfFour }}</span>
                         </li>
+
                         <li class="d-flex gap-2 align-items-center">
                             <span>3/5</span>
                             {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfThree }) }}
                             <span>{{ video_game.numberOfRatingsPerValue.numberOfThree }}</span>
                         </li>
+
                         <li class="d-flex gap-2 align-items-center">
                             <span>2/5</span>
                             {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfTwo }) }}
                             <span>{{ video_game.numberOfRatingsPerValue.numberOfTwo }}</span>
                         </li>
+
                         <li class="d-flex gap-2 align-items-center">
                             <span>1/5</span>
                             {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfOne }) }}
@@ -54,46 +77,83 @@
                         </li>
                     </ul>
                 </div>
+
             </div>
+
+            {# ==== Colonne contenu avec TAB Avis actif ==== #}
             <div class="col-8">
-                <twig:Tabs>
-                    {% block home %}
+
+                {# ==== ONGLET AVIS ACTIVÉ PAR DÉFAUT ==== #}
+                <ul class="nav nav-pills mb-4">
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           data-bs-toggle="tab"
+                           data-bs-target="#pane-home">Accueil</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           data-bs-toggle="tab"
+                           data-bs-target="#pane-test">Test</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           data-bs-toggle="tab"
+                           aria-selected="true"
+                           data-bs-target="#pane-reviews">Avis</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+
+                    {# PANE ACCUEIL (non actif) #}
+                    <div class="tab-pane fade" id="pane-home">
                         <div class="bg-light p-3 rounded">
                             <h2 class="text-uppercase">Description</h2>
                             {{ video_game.description|nl2br }}
                         </div>
-                    {% endblock %}
-                    {% block test %}
+                    </div>
+
+                    {# PANE TEST (non actif) #}
+                    <div class="tab-pane fade" id="pane-test">
                         <div class="bg-light p-3 rounded">
                             <h2 class="text-uppercase">Test CritiPixel</h2>
                             {{ video_game.test|nl2br }}
                         </div>
-                    {% endblock %}
-                    {% block reviews %}
+                    </div>
+
+                    {# PANE AVIS (ACTIF PAR DÉFAUT) #}
+                    <div class="tab-pane fade show active" id="pane-reviews">
+
                         <div class="bg-light p-3 rounded">
                             <h2 class="text-uppercase">Avis des lecteurs</h2>
+
+                            {# ==== FORMULAIRE D'AJOUT D'AVIS ==== #}
                             {% if is_granted('review', video_game) %}
                                 <div class="mb-4">
                                     {{ form_start(form) }}
-                                        {{ form_errors(form) }}
-                                        <fieldset class="mb-3">
-                                            {{ form_row(form.rating) }}
-                                            {{ form_row(form.comment) }}
-                                        </fieldset>
-                                        <button class="btn btn-primary py-2" type="submit">Poster</button>
+                                    <fieldset class="mb-3">
+                                        {{ form_row(form.rating) }}
+                                        {{ form_row(form.comment) }}
+                                    </fieldset>
+                                    <button class="btn btn-primary py-2" type="submit">Poster</button>
                                     {{ form_end(form) }}
                                 </div>
                             {% endif %}
+
+                            {# ==== LISTE DES AVIS ==== #}
                             <div class="list-group">
                                 {% for review in video_game.reviews %}
                                     {{ component('Review', { review: review }) }}
                                 {% endfor %}
                             </div>
+
                         </div>
-                    {% endblock %}
-                </twig:Tabs>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
 {% endblock %}
-

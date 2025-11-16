@@ -20,10 +20,20 @@ class VideoGameVoter extends Voter
     {
         $user = $token->getUser();
 
+        // On doit être connecté
         if (!$user instanceof User) {
             return false;
         }
 
-        return !$subject->hasAlreadyReview($user);
+        /** @var VideoGame $game */
+        $game = $subject;
+
+        // Si l'utilisateur a déjà laissé un avis → refus
+        if ($game->hasAlreadyReview($user)) {
+            return false;
+        }
+
+        // Autoriser si c'est bien un User authentifié
+        return true;
     }
 }

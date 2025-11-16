@@ -16,7 +16,7 @@
                     {% endfor %}
                 </div>
                 <div class="ratings">
-                    <twig:Rating rating="{{ video_game.rating }}" label="Test" />
+                    <twig:Rating rating="{{ video_game.rating ?? 0}}" label="Test" />
                     {% if video_game.averageRating is not null %}
                         <twig:Rating rating="{{ video_game.averageRating }}" label="Avis" />
                     {% endif %}
