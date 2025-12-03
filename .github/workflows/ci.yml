@@ -10,9 +10,12 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+
+            # 1) Télécharger le repository
             - name: Checkout repository
               uses: actions/checkout@v4
 
+            # 2) Installer PHP 8.4 + extensions
             - name: Setup PHP 8.4
               uses: shivammathur/setup-php@v2
               with:
@@ -20,14 +23,21 @@ jobs:
                   extensions: intl, mbstring, sqlite, pdo_sqlite
                   tools: composer:v2
 
+            # 3) Vérifier la version PHP
+            - name: Check PHP version
+              run: php -v
+
+            # 4) Installer les dépendances (IMPORTANT : --no-scripts)
             - name: Install dependencies (no scripts)
               working-directory: ${{ github.workspace }}
               run: composer install --no-interaction --no-progress --no-scripts
 
+            # 5) Vérifier que PHPStan fonctionne
             - name: Run PHPStan
               working-directory: ${{ github.workspace }}
               run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
+            # 6) Préparer la base de test SQLite
             - name: Prepare SQLite database
               working-directory: ${{ github.workspace }}
               run: |
@@ -35,6 +45,7 @@ jobs:
                   php bin/console doctrine:schema:create --env=test
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
 
-            - name: Run PHPUnit
+            # 7) Lancer PHPUnit avec output détaillé
+            - name: Run PHPUnit (verbose)
               working-directory: ${{ github.workspace }}
-              run: php bin/phpunit --colors=always
+              run: php bin/phpunit --testdox --verbose --colors=always
