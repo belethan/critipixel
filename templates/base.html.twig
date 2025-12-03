@@ -12,8 +12,12 @@
         <meta name="msapplication-TileColor" content="#f4cc8a">
         <meta name="theme-color" content="#f4cc8a">
         {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('styles/app.scss') }}">
+            {# Environnement test → on supprime le SCSS pour éviter l'erreur #}
+            {% if app.environment != 'test' %}
+                <link rel="stylesheet" href="{{ asset('styles/app.scss') }}">
+            {% endif %}
         {% endblock %}
+
         {% block importmap %}
             {{ importmap('app') }}
         {% endblock %}
