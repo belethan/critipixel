@@ -1,32 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         colors="true"
          bootstrap="tests/bootstrap.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         failOnRisky="false"
+         failOnWarning="false"
 >
-    <php>
-        <ini name="display_errors" value="1" />
-        <ini name="error_reporting" value="-1" />
-        <server name="APP_ENV" value="test" force="true" />
-        <server name="SHELL_VERBOSITY" value="-1" />
-        <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
-        <server name="SYMFONY_PHPUNIT_VERSION" value="9.6" />
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
-        <env name="SYMFONY_PHPUNIT_LOCALE" value="fr_FR" />
-    </php>
-
+    <!-- =========================== -->
+    <!--  TEST DIRECTORIES           -->
+    <!-- =========================== -->
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
 
+    <!-- =========================== -->
+    <!--  PHP / Symfony ENV VARS     -->
+    <!-- =========================== -->
+    <php>
+        <!-- Toujours en mode test -->
+        <server name="APP_ENV" value="test" />
+
+        <!-- TRES IMPORTANT POUR SYMFONY -->
+        <server name="KERNEL_CLASS" value="App\Kernel" />
+
+        <!-- Nécessaire pour éviter les messages de dépréciation -->
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
+
+        <!-- Localisation -->
+        <env name="SYMFONY_PHPUNIT_LOCALE" value="fr_FR" />
+
+        <!-- Debug -->
+        <server name="SHELL_VERBOSITY" value="-1" />
+
+        <!-- PHPUnit version -->
+        <server name="SYMFONY_PHPUNIT_VERSION" value="9.6" />
+    </php>
+
+    <!-- =========================== -->
+    <!--  CODE COVERAGE (optional)   -->
+    <!-- =========================== -->
     <coverage processUncoveredFiles="true">
         <include>
             <directory suffix=".php">src</directory>
         </include>
 
-        <!-- Ajout des rapports -->
         <report>
             <text outputFile="coverage.txt"/>
             <html outputDirectory="coverage-html"/>
@@ -34,7 +55,11 @@
         </report>
     </coverage>
 
+    <!-- =========================== -->
+    <!--  Symfony Test Listener      -->
+    <!-- =========================== -->
     <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
     </listeners>
+
 </phpunit>
