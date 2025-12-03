@@ -11,7 +11,7 @@ jobs:
 
         env:
             APP_ENV: test
-            DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
+            DATABASE_URL: "sqlite:///tmp/critipixel_test.db"
 
         steps:
             - name: Checkout repository
@@ -27,17 +27,18 @@ jobs:
                   extensions: intl, mbstring, sqlite, pdo_sqlite
                   tools: composer:v2
 
-            - name: Install dependencies (no scripts)
+            - name: Install dependencies
               run: composer install --no-interaction --no-progress --no-scripts
 
-            - name: Create SQLite test database file
-              run: |
-                  mkdir -p var
-                  touch var/test.db
-                  chmod 666 var/test.db
-                  ls -l var
+            - name: Install importmap assets
+              run: php bin/console importmap:install
 
-            - name: Prepare SQLite database
+            - name: Create SQLite file
+              run: |
+                  touch /tmp/critipixel_test.db
+                  chmod 777 /tmp/critipixel_test.db
+
+            - name: Prepare Doctrine schema + fixtures
               run: |
                   php bin/console doctrine:schema:create --env=test
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
