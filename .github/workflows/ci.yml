@@ -19,6 +19,9 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
+            - name: Debug workspace
+              run: ls -R ${{ github.workspace }}
+
             # 2) Installer PHP 8.4 + extensions
             - name: Setup PHP 8.4
               uses: shivammathur/setup-php@v2
