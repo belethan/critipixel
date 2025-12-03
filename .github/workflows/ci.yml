@@ -13,9 +13,16 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Cleanup workspace (force remove old cache)
+              run: |
+                  echo "Cleaning workspace..."
+                  rm -rf ${{ github.workspace }}/*
 
-            - name: Checkout repository
+            - name: Checkout repository (full clean)
               uses: actions/checkout@v4
+              with:
+                  clean: true
+                  fetch-depth: 0
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -28,34 +35,13 @@ jobs:
             - name: Install Dependencies (no scripts)
               run: composer install --no-progress --no-interaction --no-scripts
 
-            #  NOUVEAU : on détecte où GitHub a mis ton projet
-            - name: Detect project structure
+            - name: Detect project directory
               run: |
                   echo "=== WORKSPACE ROOT ==="
                   ls -la
-                  echo "=== SUBDIR critipixel ==="
-                  ls -la critipixel || true
-                  echo "=== DOUBLE SUBDIR ==="
-                  ls -la critipixel/critipixel || true
 
-            #  NOUVEAU : on exécute PHPStan dans les 3 dossiers possibles
-            - name: Run PHPStan (auto-detect path)
-              run: |
-                  if [ -f phpstan.neon ]; then
-                      echo "Running PHPStan from root"
-                      vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
-                  elif [ -f critipixel/phpstan.neon ]; then
-                      echo "Running PHPStan from critipixel/"
-                      cd critipixel
-                      vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
-                  elif [ -f critipixel/critipixel/phpstan.neon ]; then
-                      echo "Running PHPStan from critipixel/critipixel/"
-                      cd critipixel/critipixel
-                      vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
-                  else
-                      echo "phpstan.neon introuvable nulle part"
-                      exit 1
-                  fi
+            - name: Run PHPStan
+              run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
             - name: Create test database
               run: |
