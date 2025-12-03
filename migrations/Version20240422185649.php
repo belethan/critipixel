@@ -16,9 +16,82 @@ final class Version20240422185649 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        //
+        $platform = $this->connection->getDatabasePlatform()->getName();
+
+        ////////////////////////////////////////////////////////////////////////
+        // MODE SQLITE : version simplifiée, SANS index, SANS foreign keys strict
+        ////////////////////////////////////////////////////////////////////////
+        if ($platform === 'sqlite') {
+
+            // TAG
+            $this->addSql('
+                CREATE TABLE tag (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    code VARCHAR(255) NOT NULL,
+                    name VARCHAR(30) NOT NULL
+                );
+            ');
+
+            // USER
+            $this->addSql('
+                CREATE TABLE user (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username VARCHAR(30) NOT NULL,
+                    email VARCHAR(255) NOT NULL,
+                    password VARCHAR(60) NOT NULL
+                );
+            ');
+
+            // VIDEO_GAME
+            $this->addSql('
+                CREATE TABLE video_game (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title VARCHAR(100) NOT NULL,
+                    image_name VARCHAR(255) DEFAULT NULL,
+                    image_size INTEGER DEFAULT NULL,
+                    slug VARCHAR(255) NOT NULL,
+                    description TEXT NOT NULL,
+                    release_date DATE NOT NULL,
+                    updated_at DATETIME DEFAULT NULL,
+                    test TEXT DEFAULT NULL,
+                    rating INTEGER DEFAULT NULL,
+                    average_rating INTEGER DEFAULT NULL,
+                    number_of_ratings_per_value_number_of_one   INTEGER NOT NULL,
+                    number_of_ratings_per_value_number_of_two   INTEGER NOT NULL,
+                    number_of_ratings_per_value_number_of_three INTEGER NOT NULL,
+                    number_of_ratings_per_value_number_of_four  INTEGER NOT NULL,
+                    number_of_ratings_per_value_number_of_five  INTEGER NOT NULL
+                );
+            ');
+
+            // REVIEW (pas de clés étrangères strictes en SQLite)
+            $this->addSql('
+                CREATE TABLE review (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    video_game_id INTEGER NOT NULL,
+                    user_id INTEGER NOT NULL,
+                    rating INTEGER NOT NULL,
+                    comment TEXT DEFAULT NULL
+                );
+            ');
+
+            // PIVOT video_game_tags
+            $this->addSql('
+                CREATE TABLE video_game_tags (
+                    video_game_id INTEGER NOT NULL,
+                    tag_id INTEGER NOT NULL,
+                    PRIMARY KEY(video_game_id, tag_id)
+                );
+            ');
+
+            return; // IMPORTANT : on sort, on ne fait pas la version MySQL
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // MODE MYSQL : version complète avec index, InnoDB, charset, FK
+        ////////////////////////////////////////////////////////////////////////
+
         // TAG
-        //
         $this->addSql('
             CREATE TABLE tag (
                 id INT AUTO_INCREMENT NOT NULL,
@@ -31,9 +104,7 @@ final class Version20240422185649 extends AbstractMigration
               ENGINE = InnoDB;
         ');
 
-        //
         // USER
-        //
         $this->addSql('
             CREATE TABLE user (
                 id INT AUTO_INCREMENT NOT NULL,
@@ -48,9 +119,7 @@ final class Version20240422185649 extends AbstractMigration
               ENGINE = InnoDB;
         ');
 
-        //
-        // VIDEO GAME
-        //
+        // VIDEO_GAME
         $this->addSql('
             CREATE TABLE video_game (
                 id INT AUTO_INCREMENT NOT NULL,
@@ -78,9 +147,7 @@ final class Version20240422185649 extends AbstractMigration
               ENGINE = InnoDB;
         ');
 
-        //
         // REVIEW
-        //
         $this->addSql('
             CREATE TABLE review (
                 id INT AUTO_INCREMENT NOT NULL,
@@ -108,9 +175,7 @@ final class Version20240422185649 extends AbstractMigration
               ENGINE = InnoDB;
         ');
 
-        //
-        // VIDEO GAME TAGS (Pivot)
-        //
+        // VIDEO_GAME_TAGS
         $this->addSql('
             CREATE TABLE video_game_tags (
                 video_game_id INT NOT NULL,
@@ -138,7 +203,6 @@ final class Version20240422185649 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // Toujours dans le bon ordre
         $this->addSql('DROP TABLE video_game_tags');
         $this->addSql('DROP TABLE review');
         $this->addSql('DROP TABLE video_game');
