@@ -10,7 +10,7 @@ parameters:
     tmpDir: var/cache/phpstan
 
     symfony:
-        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+        containerXmlPath: var/cache/test/App_KernelTestDebugContainer.xml
 
     scanDirectories:
         - src

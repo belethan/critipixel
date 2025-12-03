@@ -17,11 +17,8 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Debug PHPStan paths
-              run: |
-                  pwd
-                  ls -l .
-                  ls -l ${{ github.workspace }}
+            - name: Debug workspace
+              run: pwd && ls -R .
 
             - name: Setup PHP 8.4
               uses: shivammathur/setup-php@v2
@@ -38,11 +35,19 @@ jobs:
                   mkdir -p var/data
                   touch var/data/test.db
                   chmod -R 777 var/data
+                  ls -l var/data
 
-            - name: Prepare SQLite database (schema only)
+            - name: Prepare SQLite database (schema + fixtures)
               run: |
                   php bin/console doctrine:schema:create --env=test
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
+
+            # 👇 NOUVELLE ÉTAPE : génération du container XML pour PHPStan
+            - name: Generate Symfony container XML for PHPStan
+              run: |
+                  mkdir -p var/cache/test
+                  php bin/console debug:container --env=test --format=xml > var/cache/test/App_KernelTestDebugContainer.xml
+                  ls -l var/cache/test
 
             - name: Run PHPStan
               run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
