@@ -17,8 +17,11 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Debug workspace
-              run: pwd && ls -R .
+            - name: Debug PHPStan paths
+              run: |
+                  pwd
+                  ls -l .
+                  ls -l ${{ github.workspace }}
 
             - name: Setup PHP 8.4
               uses: shivammathur/setup-php@v2
