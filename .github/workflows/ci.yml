@@ -10,54 +10,27 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            # Always start clean
-            - name: Cleanup workspace
-              run: rm -rf ${{ github.workspace }}/*
-
-            # Checkout clean copy
             - name: Checkout repository
               uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-                  clean: true
 
-            # Install PHP BEFORE composer
-            - name: Setup PHP
+            - name: Setup PHP 8.4
               uses: shivammathur/setup-php@v2
               with:
                   php-version: '8.4'
-                  extensions: intl, mbstring, pdo_mysql
+                  extensions: intl, mbstring, sqlite, pdo_sqlite
                   tools: composer:v2
-                  coverage: none
 
-            # Install dependencies without triggering Symfony cache:clear
-            - name: Install Dependencies (no scripts)
-              working-directory: ${{ github.workspace }}
+            - name: Install dependencies (no scripts)
               run: composer install --no-interaction --no-progress --no-scripts
 
-            # Debug listing (important)
-            - name: Debug workspace
-              working-directory: ${{ github.workspace }}
-              run: ls -la
-
-            # PHPStan with ABSOLUTE config
             - name: Run PHPStan
-              working-directory: ${{ github.workspace }}
-              run: |
-                  vendor/bin/phpstan analyse \
-                    --configuration="${{ github.workspace }}/phpstan.neon" \
-                    --memory-limit=1G \
-                    --no-progress
+              run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
-            # Prepare SQLite test database
-            - name: Prepare test database (SQLite)
-              working-directory: ${{ github.workspace }}
+            - name: Prepare SQLite test database
               run: |
                   mkdir -p var/data
-                  php bin/console doctrine:database:create --env=test --if-not-exists
+                  php bin/console doctrine:database:create --if-not-exists --env=test
                   php bin/console doctrine:migrations:migrate --env=test -n
 
-            # Run tests
             - name: Run PHPUnit
-              working-directory: ${{ github.workspace }}
-              run: symfony php bin/phpunit --colors=always
+              run: php bin/phpunit --colors=always
