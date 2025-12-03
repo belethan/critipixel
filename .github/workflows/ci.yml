@@ -14,11 +14,9 @@ jobs:
 
         steps:
 
-            # Checkout du code
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            # Configuration PHP
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
@@ -27,29 +25,42 @@ jobs:
                   tools: composer:v2
                   coverage: none
 
-            # Installation des dépendances sinon problème mysql SANS scripts (évite cache:clear)
             - name: Install Dependencies (no scripts)
               run: composer install --no-progress --no-interaction --no-scripts
-              working-directory: ${{ github.workspace }}
 
-            # Debug : montre les fichiers réellement présents sur GitHub
-            - name: Debug listing
-              run: ls -la
-              working-directory: ${{ github.workspace }}
+            #  NOUVEAU : on détecte où GitHub a mis ton projet
+            - name: Detect project structure
+              run: |
+                  echo "=== WORKSPACE ROOT ==="
+                  ls -la
+                  echo "=== SUBDIR critipixel ==="
+                  ls -la critipixel || true
+                  echo "=== DOUBLE SUBDIR ==="
+                  ls -la critipixel/critipixel || true
 
-            # Analyse PHPStan
-            - name: Run PHPStan (force correct config)
-              run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
-              working-directory: ${{ github.workspace }}
+            #  NOUVEAU : on exécute PHPStan dans les 3 dossiers possibles
+            - name: Run PHPStan (auto-detect path)
+              run: |
+                  if [ -f phpstan.neon ]; then
+                      echo "Running PHPStan from root"
+                      vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
+                  elif [ -f critipixel/phpstan.neon ]; then
+                      echo "Running PHPStan from critipixel/"
+                      cd critipixel
+                      vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
+                  elif [ -f critipixel/critipixel/phpstan.neon ]; then
+                      echo "Running PHPStan from critipixel/critipixel/"
+                      cd critipixel/critipixel
+                      vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
+                  else
+                      echo "phpstan.neon introuvable nulle part"
+                      exit 1
+                  fi
 
-            # Préparation BDD test
             - name: Create test database
               run: |
                   php bin/console doctrine:database:create --env=test
                   php bin/console doctrine:migrations:migrate --env=test -n
-              working-directory: ${{ github.workspace }}
 
-            # Exécution PHPUnit
             - name: Run PHPUnit
               run: symfony php bin/phpunit --colors=always
-              working-directory: ${{ github.workspace }}
