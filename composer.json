@@ -47,6 +47,7 @@
   "config": {
     "allow-plugins": {
       "php-http/discovery": true,
+      "phpstan/extension-installer": true,
       "symfony/flex": true,
       "symfony/runtime": true
     },
@@ -78,35 +79,38 @@
     "symfony/polyfill-php81": "*"
   },
 
-  "scripts": {
-    "db": [
-      "symfony console doctrine:database:drop -f --if-exists",
-      "symfony console doctrine:database:create",
-      "symfony console doctrine:migrations:migrate -n",
-      "symfony console doctrine:fixtures:load -n --purge-with-truncate"
-    ],
-    "db-test": [
-      "symfony console doctrine:database:drop -f --if-exists --env=test",
-      "symfony console doctrine:database:create --env=test",
-      "symfony console doctrine:migrations:migrate -n --env=test",
-      "symfony console doctrine:fixtures:load -n --purge-with-truncate --env=test"
-    ],
-    "test": [
-      "composer db-test",
-      "symfony php bin/phpunit"
-    ],
-    "auto-scripts": {
-      "cache:clear": "symfony-cmd",
-      "assets:install %PUBLIC_DIR%": "symfony-cmd",
-      "importmap:install": "symfony-cmd"
+    "scripts": {
+        "db": [
+            "symfony console doctrine:database:drop -f --if-exists",
+            "symfony console doctrine:database:create",
+            "symfony console doctrine:migrations:migrate -n",
+            "symfony console doctrine:fixtures:load -n --purge-with-truncate"
+        ],
+        "db-test": [
+            "symfony console doctrine:database:drop -f --if-exists --env=test",
+            "symfony console doctrine:database:create --env=test",
+            "symfony console doctrine:migrations:migrate -n --env=test",
+            "symfony console doctrine:fixtures:load -n --purge-with-truncate --env=test"
+        ],
+        "test": [
+            "composer db-test",
+            "symfony php bin/phpunit"
+        ],
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "cs-fix": "vendor/bin/php-cs-fixer fix",
+        "cs-check": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
     },
-    "post-install-cmd": [
-      "@auto-scripts"
-    ],
-    "post-update-cmd": [
-      "@auto-scripts"
-    ]
-  },
 
   "conflict": {},
 
@@ -120,6 +124,12 @@
   "require-dev": {
     "doctrine/doctrine-fixtures-bundle": "^4.3",
     "fakerphp/faker": "^1.23",
+    "friendsofphp/php-cs-fixer": "^3.91",
+    "phpstan/extension-installer": "^1.4",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-doctrine": "^2.0",
+    "phpstan/phpstan-phpunit": "^2.0",
+    "phpstan/phpstan-symfony": "^2.0",
     "phpunit/phpunit": "^10.5",
     "symfony/asset": "^7.3",
     "symfony/browser-kit": "^7.3",

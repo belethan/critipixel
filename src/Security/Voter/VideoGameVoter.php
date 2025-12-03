@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Security\Voter;
 
 use App\Model\Entity\User;
@@ -13,7 +15,7 @@ class VideoGameVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $attribute === self::REVIEW && $subject instanceof VideoGame;
+        return self::REVIEW === $attribute && $subject instanceof VideoGame;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool

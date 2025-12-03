@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Auth;
 
 use App\Tests\Functional\FunctionalTestCase;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class LoginTest extends FunctionalTestCase
 {
@@ -17,14 +16,11 @@ final class LoginTest extends FunctionalTestCase
         // 2. On soumet le formulaire
         $crawler = $this->client->submitForm('Se connecter', [
             'email' => 'user+1@email.com',
-            'password' => 'password'
+            'password' => 'password',
         ]);
-
 
         // 3. Une connexion valide redirige toujours -> on vérifie la redirection
         self::assertTrue($this->client->getResponse()->isRedirect());
-
-
 
         // 4. On suit la redirection
         $this->client->followRedirect();
@@ -47,8 +43,6 @@ final class LoginTest extends FunctionalTestCase
         self::assertNull($tokenAfterLogout, 'Le token doit être null après déconnexion');
     }
 
-
-
     public function testThatLoginShouldFailed(): void
     {
         // 1. Charger la page de login
@@ -57,7 +51,7 @@ final class LoginTest extends FunctionalTestCase
         // 2. Soumettre un mauvais mot de passe
         $this->client->submitForm('Se connecter', [
             'email' => 'user1@email.com',
-            'password' => 'badpassword'
+            'password' => 'badpassword',
         ]);
 
         // 3. Suivre la redirection (retour sur /auth/login)
@@ -68,9 +62,8 @@ final class LoginTest extends FunctionalTestCase
 
         // 5. Assert : l'utilisateur ne doit PAS être connecté
         self::assertTrue(
-            ! $token || $token->getUser() === 'anon.',
+            !$token || 'anon.' === $token->getUser(),
             'L’utilisateur ne doit pas être authentifié avec un mauvais mot de passe'
         );
     }
-
 }

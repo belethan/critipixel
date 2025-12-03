@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Model\Entity\Tag;
@@ -19,10 +21,9 @@ class TagFixtures extends Fixture
             $tag->setName($name);
 
             $manager->persist($tag);
-            $this->addReference(self::TAG_REF . ($i+1), $tag);
+            $this->addReference(self::TAG_REF.($i + 1), $tag);
         }
 
         $manager->flush();
     }
 }
-

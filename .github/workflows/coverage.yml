@@ -1,0 +1,48 @@
+name: PHPUnit Coverage
+
+on:
+    push:
+        branches:
+            - main
+            - devuser
+            - versbeta
+    pull_request:
+
+jobs:
+    coverage:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+                  coverage: xdebug
+                  extensions: intl, mbstring, pdo_mysql
+
+            - name: Install dependencies
+              run: composer install --no-interaction --no-progress
+
+            - name: Prepare test database
+              run: |
+                  php bin/console doctrine:database:create --env=test
+                  php bin/console doctrine:migrations:migrate --env=test -n
+
+            - name: Run PHPUnit with coverage
+              run: |
+                  symfony php bin/phpunit --coverage-html coverage-html --coverage-clover coverage.xml
+
+            - name: Upload coverage HTML
+              uses: actions/upload-artifact@v4
+              with:
+                  name: coverage-html
+                  path: coverage-html/
+
+            - name: Upload coverage Clover
+              uses: actions/upload-artifact@v4
+              with:
+                  name: coverage-clover
+                  path: coverage.xml

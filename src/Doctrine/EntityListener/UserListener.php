@@ -12,7 +12,8 @@ class UserListener
 {
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher
-    ) {}
+    ) {
+    }
 
     public function prePersist(User $user): void
     {

@@ -15,7 +15,7 @@ final class ShowTest extends WebTestBase
         self::assertNotNull($game, 'Aucun jeu en base de test.');
 
         // Accéder à la page via le slug réel
-        $this->get('/' . $game->getSlug());
+        $this->get('/'.$game->getSlug());
 
         // Vérifier que la page charge correctement
         self::assertResponseIsSuccessful();

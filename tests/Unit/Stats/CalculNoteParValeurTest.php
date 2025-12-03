@@ -66,16 +66,24 @@ final class CalculNoteParValeurTest extends TestCase
         int $quatre = 0,
         int $cinq = 0
     ): NumberOfRatingPerValue {
-
         $etat = new NumberOfRatingPerValue();
 
-        for ($i = 0; $i < $un; $i++)   { $etat->increaseOne(); }
-        for ($i = 0; $i < $deux; $i++) { $etat->increaseTwo(); }
-        for ($i = 0; $i < $trois; $i++) { $etat->increaseThree(); }
-        for ($i = 0; $i < $quatre; $i++) { $etat->increaseFour(); }
-        for ($i = 0; $i < $cinq; $i++) { $etat->increaseFive(); }
+        for ($i = 0; $i < $un; ++$i) {
+            $etat->increaseOne();
+        }
+        for ($i = 0; $i < $deux; ++$i) {
+            $etat->increaseTwo();
+        }
+        for ($i = 0; $i < $trois; ++$i) {
+            $etat->increaseThree();
+        }
+        for ($i = 0; $i < $quatre; ++$i) {
+            $etat->increaseFour();
+        }
+        for ($i = 0; $i < $cinq; ++$i) {
+            $etat->increaseFive();
+        }
 
         return $etat;
     }
 }
-

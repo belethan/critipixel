@@ -8,6 +8,10 @@
 * Extension PHP Xdebug
 * Symfony (binaire)
 
+
+![CI Symfony](https://github.com/belethan/critipixel/actions/workflows/ci.yml/badge.svg)
+
+
 ## Installation
 
 ### Composer

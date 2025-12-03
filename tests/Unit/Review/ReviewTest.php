@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Entity;
 
 use App\Model\Entity\Review;
@@ -13,6 +15,7 @@ class ReviewTest extends KernelTestCase
     private function getValidator(): ValidatorInterface
     {
         self::bootKernel();
+
         return static::getContainer()->get('validator');
     }
 
@@ -20,7 +23,7 @@ class ReviewTest extends KernelTestCase
     {
         $review = new Review();
         $review->setRating(4);
-        $review->setComment("Super jeu !");
+        $review->setComment('Super jeu !');
         $review->setUser(new User());
         $review->setVideoGame(new VideoGame());
 
@@ -43,7 +46,7 @@ class ReviewTest extends KernelTestCase
         $review->setRating(null);
 
         $errors = $validator->validate($review);
-        $this->assertGreaterThan(0, count($errors));
+        $this->assertGreaterThan(0, \count($errors));
     }
 
     public function testRatingMustBeBetween1And5(): void
@@ -54,12 +57,12 @@ class ReviewTest extends KernelTestCase
         // Note trop basse
         $review->setRating(0);
         $errors = $validator->validate($review);
-        $this->assertGreaterThan(0, count($errors));
+        $this->assertGreaterThan(0, \count($errors));
 
         // Note trop haute
         $review->setRating(6);
         $errors = $validator->validate($review);
-        $this->assertGreaterThan(0, count($errors));
+        $this->assertGreaterThan(0, \count($errors));
     }
 
     public function testCommentIsOptional(): void
@@ -78,9 +81,9 @@ class ReviewTest extends KernelTestCase
 
         $review
             ->setRating(5)
-            ->setComment("Excellent");
+            ->setComment('Excellent');
 
         $this->assertSame(5, $review->getRating());
-        $this->assertSame("Excellent", $review->getComment());
+        $this->assertSame('Excellent', $review->getComment());
     }
 }

@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
+use App\Faker\FrenchGeneratorFactory;
 use App\Model\Entity\Review;
 use App\Model\Entity\User;
 use App\Model\Entity\VideoGame;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use App\Faker\FrenchGeneratorFactory;
+use Doctrine\Persistence\ObjectManager;
 
 class ReviewFixtures extends Fixture implements DependentFixtureInterface
 {
@@ -16,8 +18,7 @@ class ReviewFixtures extends Fixture implements DependentFixtureInterface
     {
         $faker = FrenchGeneratorFactory::create();
 
-        for ($i = 1; $i <= 10; $i++) {
-
+        for ($i = 1; $i <= 10; ++$i) {
             /** @var VideoGame $game */
             $game = $this->getReference(VideoGameFixtures::GAME_REF.$i, VideoGame::class);
 

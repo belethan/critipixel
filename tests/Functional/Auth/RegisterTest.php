@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class RegisterTest extends FunctionalTestCase
 {
+    /* Penser à supprimer le user : user@email.com avant exécuter le test */
     public function testThatRegistrationShouldSucceeded(): void
     {
         $this->get('/auth/register');
@@ -19,7 +20,7 @@ final class RegisterTest extends FunctionalTestCase
         self::assertResponseRedirects('/auth/login');
 
         $user = $this->getEntityManager()->getRepository(User::class)->findOneBy([
-            'email' => 'user@email.com'
+            'email' => 'user@email.com',
         ]);
 
         self::assertNotNull($user);
@@ -34,8 +35,8 @@ final class RegisterTest extends FunctionalTestCase
     {
         // Préparer les données existantes pour les tests d'unicité
         if (
-            ($formData['register[username]'] ?? null) === 'user+1' ||
-            ($formData['register[email]'] ?? null) === 'user+1@email.com'
+            ($formData['register[username]'] ?? null) === 'user+1'
+            || ($formData['register[email]'] ?? null) === 'user+1@email.com'
         ) {
             $existing = new User();
             $existing->setUsername('user+1');
@@ -67,65 +68,63 @@ final class RegisterTest extends FunctionalTestCase
 
         // ✔ Le controller renvoie bien 422 en cas d'erreur
         self::assertResponseStatusCodeSame(422);
-
     }
 
-
-    //La fonction provideInvalidFormData est utilisée par PHPUNIT en lisant attribut DataProvider dans le test
+    // La fonction provideInvalidFormData est utilisée par PHPUNIT en lisant attribut DataProvider dans le test
     public static function provideInvalidFormData(): iterable
     {
-       /* yield 'empty username' => self::getFormData(['register[username]' => '']);
-        yield 'non unique username' => self::getFormData(['register[username]' => 'user+1']);
-        yield 'too long username' => self::getFormData(['register[username]' => 'Lorem ipsum dolor sit amet orci aliquam']);
-        yield 'empty email' => self::getFormData(['register[email]' => '']);
-        yield 'non unique email' => self::getFormData(['register[email]' => 'user+1@email.com']);
-        yield 'invalid email' => self::getFormData(['register[email]' => 'fail']);*/
+        /* yield 'empty username' => self::getFormData(['register[username]' => '']);
+         yield 'non unique username' => self::getFormData(['register[username]' => 'user+1']);
+         yield 'too long username' => self::getFormData(['register[username]' => 'Lorem ipsum dolor sit amet orci aliquam']);
+         yield 'empty email' => self::getFormData(['register[email]' => '']);
+         yield 'non unique email' => self::getFormData(['register[email]' => 'user+1@email.com']);
+         yield 'invalid email' => self::getFormData(['register[email]' => 'fail']);*/
         yield 'empty username' => [[
             'register' => [
                 'username' => '',
                 'email' => 'user@email.com',
-                'plainPassword' => 'SuperPassword123!'
-            ]
+                'plainPassword' => 'SuperPassword123!',
+            ],
         ]];
 
         yield 'non unique username' => [[
             'register' => [
                 'username' => 'user+1',
                 'email' => 'user@email.com',
-                'plainPassword' => 'SuperPassword123!'
-            ]
+                'plainPassword' => 'SuperPassword123!',
+            ],
         ]];
 
         yield 'too long username' => [[
             'register' => [
                 'username' => 'Lorem ipsum dolor sit amet orci aliquam',
                 'email' => 'user@email.com',
-                'plainPassword' => 'SuperPassword123!'
-            ]
+                'plainPassword' => 'SuperPassword123!',
+            ],
         ]];
 
         yield 'empty email' => [[
             'register' => [
                 'username' => 'username',
                 'email' => '',
-                'plainPassword' => 'SuperPassword123!'
-            ]
+                'plainPassword' => 'SuperPassword123!',
+            ],
         ]];
 
         yield 'non unique email' => [[
             'register' => [
                 'username' => 'username',
                 'email' => 'user+1@email.com',
-                'plainPassword' => 'SuperPassword123!'
-            ]
+                'plainPassword' => 'SuperPassword123!',
+            ],
         ]];
 
         yield 'invalid email' => [[
             'register' => [
                 'username' => 'username',
                 'email' => 'fail',
-                'plainPassword' => 'SuperPassword123!'
-            ]
+                'plainPassword' => 'SuperPassword123!',
+            ],
         ]];
     }
 
@@ -136,7 +135,7 @@ final class RegisterTest extends FunctionalTestCase
                 'username' => 'username',
                 'email' => 'user@email.com',
                 'plainPassword' => 'SuperPassword123!',
-            ]
+            ],
         ];
 
         foreach ($overrideData as $key => $value) {

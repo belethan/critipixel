@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 abstract class WebTestBase extends WebTestCase
 {
     protected KernelBrowser $client;
+
     protected EntityManagerInterface $em;
 
     protected function setUp(): void
@@ -33,7 +34,7 @@ abstract class WebTestBase extends WebTestCase
     }
 
     /**
-     * Simule la connexion d’un utilisateur (fixtures obligatoires)
+     * Simule la connexion d’un utilisateur (fixtures obligatoires).
      */
     protected function login(string $email = 'user+10@example.com'): void
     {
@@ -45,7 +46,7 @@ abstract class WebTestBase extends WebTestCase
     }
 
     /**
-     * Soumet un formulaire contenant un bouton avec un label donné
+     * Soumet un formulaire contenant un bouton avec un label donné.
      */
     protected function submit(string $buttonText, array $formData = []): void
     {

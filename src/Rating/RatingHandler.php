@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Rating;
 
-use App\Model\Entity\Review;
 use App\Model\Entity\VideoGame;
 
 final readonly class RatingHandler implements CalculateAverageRating, CountRatingsPerValue
@@ -15,6 +14,7 @@ final readonly class RatingHandler implements CalculateAverageRating, CountRatin
 
         if ($reviews->isEmpty()) {
             $videoGame->setAverageRating(null);
+
             return;
         }
 
@@ -23,7 +23,7 @@ final readonly class RatingHandler implements CalculateAverageRating, CountRatin
 
         foreach ($reviews as $review) {
             $sum += $review->getRating();
-            $count++;
+            ++$count;
         }
 
         // Moyenne arrondie à l'entier
@@ -36,7 +36,7 @@ final readonly class RatingHandler implements CalculateAverageRating, CountRatin
     {
         $videoGame->getNumberOfRatingsPerValue()->clear();
 
-        if (count($videoGame->getReviews()) === 0) {
+        if (0 === \count($videoGame->getReviews())) {
             return;
         }
 

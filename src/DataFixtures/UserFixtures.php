@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Model\Entity\User;
@@ -14,13 +16,13 @@ class UserFixtures extends Fixture
 
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher
-    ) {}
+    ) {
+    }
 
     public function load(ObjectManager $manager): void
     {
         // ====== UTILISATEURS STANDARD ======
-        for ($i = 0; $i < 5; $i++) {
-
+        for ($i = 0; $i < 5; ++$i) {
             $user = new User();
 
             $username = "user{$i}";
@@ -35,7 +37,7 @@ class UserFixtures extends Fixture
             $manager->persist($user);
 
             // Permet d’utiliser les références dans les autres fixtures
-            $this->addReference(self::USER_REF . $i, $user);
+            $this->addReference(self::USER_REF.$i, $user);
         }
 
         // ====== ADMIN ======

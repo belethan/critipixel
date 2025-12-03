@@ -8,19 +8,16 @@ use App\Doctrine\Repository\VideoGameRepository;
 use App\Form\FilterType;
 use App\Model\Entity\VideoGame;
 use App\Model\ValueObject\Page;
-use Countable;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use IteratorAggregate;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Traversable;
 
 /**
- * @implements IteratorAggregate<VideoGame>
+ * @implements \IteratorAggregate<VideoGame>
  */
-final class VideoGamesList implements Countable, IteratorAggregate
+final class VideoGamesList implements \Countable, \IteratorAggregate
 {
     private FormView $form;
 
@@ -39,7 +36,7 @@ final class VideoGamesList implements Countable, IteratorAggregate
         private UrlGeneratorInterface $urlGenerator,
         private FormFactoryInterface $formFactory,
         private VideoGameRepository $videoGameRepository,
-        private Pagination  $pagination,
+        private Pagination $pagination,
     ) {
     }
 
@@ -48,7 +45,7 @@ final class VideoGamesList implements Countable, IteratorAggregate
         return $this->form;
     }
 
-      public function handleRequest(Request $request): self
+    public function handleRequest(Request $request): self
     {
         $this->filter = new Filter();
 
@@ -61,7 +58,7 @@ final class VideoGamesList implements Countable, IteratorAggregate
                 $this->filter,
                 [
                     'method' => Request::METHOD_GET,
-                    //'csrf_protection' => false,
+                    // 'csrf_protection' => false,
                 ]
             )
             ->handleRequest($request)
@@ -69,7 +66,7 @@ final class VideoGamesList implements Countable, IteratorAggregate
 
         $this->data = $this->videoGameRepository->getVideoGames($this->pagination, $this->filter);
 
-        $this->pagination->init(count($this->data), count($this));
+        $this->pagination->init(\count($this->data), \count($this));
 
         if ($this->pagination->getPage() > 1) {
             $this->pagination->add(
@@ -127,7 +124,7 @@ final class VideoGamesList implements Countable, IteratorAggregate
             );
         }
 
-        $this->pagination->init(count($this->data), count($this));
+        $this->pagination->init(\count($this->data), \count($this));
 
         return $this;
     }
@@ -142,14 +139,14 @@ final class VideoGamesList implements Countable, IteratorAggregate
         return $this->pagination;
     }
 
-    public function getIterator(): Traversable
+    public function getIterator(): \Traversable
     {
         return $this->data;
     }
 
     public function count(): int
     {
-        return count($this->data->getIterator());
+        return \count($this->data->getIterator());
     }
 
     public function generateUrl(int $page): string

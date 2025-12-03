@@ -22,11 +22,11 @@ final class AuthController extends AbstractController
         return $this->render('views/auth/login.html.twig', [
             'controller_name' => 'LoginController',
             'last_username' => $authenticationUtils->getLastUsername(),
-            'error'         => $authenticationUtils->getLastAuthenticationError(),
+            'error' => $authenticationUtils->getLastAuthenticationError(),
         ]);
     }
 
-    #[Route('/register', name: 'register', methods: ['GET','POST'])]
+    #[Route('/register', name: 'register', methods: ['GET', 'POST'])]
     public function register(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
@@ -42,7 +42,6 @@ final class AuthController extends AbstractController
 
         // Cas 2 : formulaire soumis ET valide -> on persiste
         if ($form->isSubmitted() && $form->isValid()) {
-
             // Récupérer le mot de passe car mapped=false dans RegisterType
             $plainPassword = $form->get('plainPassword')->getData();
             $user->setPlainPassword($plainPassword);
@@ -58,5 +57,4 @@ final class AuthController extends AbstractController
             'form' => $form,
         ]);
     }
-
 }

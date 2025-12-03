@@ -20,7 +20,7 @@ final class FilterType extends AbstractType
             ->add('search', TextType::class, [
                 'label' => 'Rechercher',
                 'required' => false,
-                'attr' =>  [
+                'attr' => [
                     'placeholder' => 'Rechercher...',
                 ],
             ])
@@ -31,7 +31,7 @@ final class FilterType extends AbstractType
                 'expanded' => true,
                 'class' => Tag::class,
                 'choice_label' => 'name',
-                'attr' =>  [
+                'attr' => [
                     'class' => 'd-flex gap-2 flex-wrap',
                 ],
             ]);
@@ -39,10 +39,10 @@ final class FilterType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        //$resolver->setDefault('data_class', Filter::class);
+        // $resolver->setDefault('data_class', Filter::class);
         $resolver->setDefaults([
             'method' => 'GET',
-            'data_class' => Filter::class // obligatoire pour éviter les erreurs
+            'data_class' => Filter::class, // obligatoire pour éviter les erreurs
         ]);
     }
 }

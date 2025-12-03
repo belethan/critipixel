@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 -️ Création avec tableau valide
 -️ Calcul du total des notes
@@ -7,6 +9,7 @@
 -️ Test d’initialisation vide
 -️ Protection contre valeurs négatives
 */
+
 namespace App\Tests\Unit\Stats;
 
 use App\Model\Entity\NumberOfRatingPerValue;

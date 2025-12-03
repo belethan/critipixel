@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\VideoGame;
 
-use App\Model\Entity\VideoGame;
 use App\Model\Entity\Review;
+use App\Model\Entity\VideoGame;
 use PHPUnit\Framework\TestCase;
 
 class VideoGameRatingTest extends TestCase
@@ -12,6 +14,7 @@ class VideoGameRatingTest extends TestCase
     {
         $review = new Review();
         $review->setRating($rating);
+
         return $review;
     }
 
