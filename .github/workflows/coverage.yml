@@ -21,17 +21,17 @@ jobs:
                   extensions: intl, mbstring, sqlite, pdo_sqlite
 
             - name: Install dependencies
-              working-directory: ${{ github.workspace }}/critipixel
+              working-directory: ${{ github.workspace }}
               run: composer install --no-interaction --no-progress
 
             - name: Prepare test database
-              working-directory: ${{ github.workspace }}/critipixel
+              working-directory: ${{ github.workspace }}
               run: |
                   php bin/console doctrine:database:create --env=test
                   php bin/console doctrine:schema:create --env=test
 
             - name: Run PHPUnit with coverage
-              working-directory: ${{ github.workspace }}/critipixel
+              working-directory: ${{ github.workspace }}
               run: |
                   php bin/phpunit --coverage-html coverage-html --coverage-clover coverage.xml
 

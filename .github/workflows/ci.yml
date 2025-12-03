@@ -21,19 +21,19 @@ jobs:
                   tools: composer:v2
 
             - name: Install dependencies (no scripts)
-              working-directory: ${{ github.workspace }}/critipixel
+              working-directory: ${{ github.workspace }}
               run: composer install --no-interaction --no-progress --no-scripts
 
             - name: Run PHPStan
-              working-directory: ${{ github.workspace }}/critipixel
+              working-directory: ${{ github.workspace }}
               run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
             - name: Prepare SQLite database
-              working-directory: ${{ github.workspace }}/critipixel
+              working-directory: ${{ github.workspace }}
               run: |
                   php bin/console doctrine:database:create --env=test --if-not-exists
                   php bin/console doctrine:schema:create --env=test
 
             - name: Run PHPUnit
-              working-directory: ${{ github.workspace }}/critipixel
+              working-directory: ${{ github.workspace }}
               run: php bin/phpunit --colors=always

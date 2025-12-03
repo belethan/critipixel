@@ -10,20 +10,19 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Checkout repository
+            - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Setup PHP 8.4
+            - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: '8.4'
-                  tools: composer:v2
-
-            - name: Verify PHP version
-              run: php -v
+                  php-version: '8.2'
+                  tools: composer
 
             - name: Install dependencies (no scripts)
+              working-directory: ${{ github.workspace }}
               run: composer install --no-interaction --no-progress --no-scripts
 
-            - name: Run PHP-CS-Fixer (dry run)
+            - name: Run PHP-CS-Fixer (dry-run)
+              working-directory: ${{ github.workspace }}
               run: vendor/bin/php-cs-fixer fix --dry-run --diff
