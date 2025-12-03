@@ -9,6 +9,10 @@ jobs:
     coverage:
         runs-on: ubuntu-latest
 
+        env:
+            APP_ENV: test
+            DATABASE_URL: "sqlite:///tmp/critipixel_test.db"
+
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
@@ -20,20 +24,18 @@ jobs:
                   coverage: xdebug
                   extensions: intl, mbstring, sqlite, pdo_sqlite
 
-            - name: Install dependencies (NO SCRIPTS)
-              working-directory: ${{ github.workspace }}
+            - name: Install dependencies (no scripts)
               run: composer install --no-interaction --no-progress --no-scripts
 
-            - name: Prepare test database
-              working-directory: ${{ github.workspace }}
+            - name: Prepare SQLite test database
               run: |
-                  php bin/console doctrine:database:create --env=test
+                  php bin/console doctrine:database:create --env=test --if-not-exists
                   php bin/console doctrine:schema:create --env=test
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
 
             - name: Run PHPUnit with coverage
-              working-directory: ${{ github.workspace }}
-              run: php bin/phpunit --coverage-html coverage-html --coverage-clover coverage.xml
+              run: |
+                  php bin/phpunit --coverage-html coverage-html --coverage-clover coverage.xml
 
             - name: Upload coverage HTML
               uses: actions/upload-artifact@v4
