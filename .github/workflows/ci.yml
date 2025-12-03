@@ -21,13 +21,27 @@ jobs:
                   extensions: intl, mbstring, sqlite, pdo_sqlite
                   tools: composer:v2
 
-            - name: Verify PHP version
-              working-directory: ${{ github.workspace }}/critipixel
-              run: php -v
-
             - name: Install dependencies (no scripts)
               working-directory: ${{ github.workspace }}/critipixel
               run: composer install --no-interaction --no-progress --no-scripts
+
+            - name: Debug version
+              working-directory: ${{ github.workspace }}/critipixel
+              run: php -v
+
+            - name: Debug folders before SQLite
+              working-directory: ${{ github.workspace }}/critipixel
+              run: |
+                  echo "PWD:"
+                  pwd
+                  echo "Listing project root:"
+                  ls -la
+                  echo "Listing var/:"
+                  ls -la var || true
+                  echo "Listing var/data:"
+                  ls -la var/data || true
+                  echo "DATABASE_URL:"
+                  php -r "echo getenv('DATABASE_URL');"
 
             - name: Run PHPStan
               working-directory: ${{ github.workspace }}/critipixel
