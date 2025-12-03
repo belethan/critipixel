@@ -10,11 +10,8 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Checkout code
+            - name: Checkout repository
               uses: actions/checkout@v4
-
-            - name: Debug workspace
-              run: ls -R .
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -22,8 +19,8 @@ jobs:
                   php-version: '8.4'
                   tools: composer
 
-            - name: Install dependencies (no scripts)
+            - name: Install dependencies
               run: composer install --no-interaction --no-progress --no-scripts
 
-            - name: Run PHP-CS-Fixer (dry-run)
+            - name: Run PHP-CS-Fixer (dry run)
               run: vendor/bin/php-cs-fixer fix --dry-run --diff
