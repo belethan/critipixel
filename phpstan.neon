@@ -1,0 +1,23 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 7
+
+    paths:
+        - src
+        - tests
+
+    tmpDir: var/cache/phpstan
+
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+
+    scanDirectories:
+        - src
+
+    excludePaths:
+        analyse:
+            - src/Kernel.php
+            - src/DataFixtures/*
+            - tests/bootstrap.php
