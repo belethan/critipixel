@@ -13,12 +13,15 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Setup PHP 8.4
+            - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
                   php-version: '8.4'
-                  extensions: intl, mbstring, sqlite, pdo_sqlite
                   tools: composer:v2
+                  coverage: none
+
+            - name: Verify PHP version
+              run: php -v
 
             - name: Install dependencies (no scripts)
               run: composer install --no-interaction --no-progress --no-scripts
@@ -26,11 +29,11 @@ jobs:
             - name: Run PHPStan
               run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
-            - name: Prepare SQLite test database
+            - name: Prepare SQLite database
               run: |
                   mkdir -p var/data
-                  php bin/console doctrine:database:create --if-not-exists --env=test
+                  php bin/console doctrine:database:create --env=test --if-not-exists
                   php bin/console doctrine:migrations:migrate --env=test -n
 
             - name: Run PHPUnit
-              run: php bin/phpunit --colors=always
+              run: php bin/phpunit
