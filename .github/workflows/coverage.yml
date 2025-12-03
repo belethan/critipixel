@@ -11,10 +11,10 @@ jobs:
 
         env:
             APP_ENV: test
-            DATABASE_URL: "sqlite:///tmp/critipixel_test.db"
+            DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
 
         steps:
-            # 1) Récupérer le code
+            # 1) Checkout repository
             - name: Checkout repository
               uses: actions/checkout@v4
 
@@ -22,7 +22,7 @@ jobs:
             - name: Debug workspace
               run: pwd && ls -R .
 
-            # 3) Installer PHP 8.4 + Xdebug
+            # 3) Setup PHP with Xdebug
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
@@ -31,34 +31,33 @@ jobs:
                   extensions: intl, mbstring, sqlite, pdo_sqlite
                   tools: composer:v2
 
-            # 4) Installer dépendances
+            # 4) Install project dependencies
             - name: Install dependencies (no scripts)
               run: composer install --no-interaction --no-progress --no-scripts
 
-            # 5) Préparer le fichier SQLite
-            - name: Create SQLite database file
+            # 5) Create SQLite test database
+            - name: Create SQLite test database file
               run: |
-                  mkdir -p /tmp
-                  touch /tmp/critipixel_test.db
-                  chmod 777 /tmp
-                  chmod 777 /tmp/critipixel_test.db
-                  ls -l /tmp
+                  mkdir -p var
+                  touch var/test.db
+                  chmod 666 var/test.db
+                  ls -l var
 
-            # 6) Préparer Doctrine (schema + fixtures)
+            # 6) Prepare database schema + fixtures
             - name: Prepare SQLite test database
               run: |
                   php bin/console doctrine:database:create --env=test --if-not-exists
                   php bin/console doctrine:schema:create --env=test
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
 
-            # 7) Lancer PHPUnit avec couverture
+            # 7) Run PHPUnit with coverage output
             - name: Run PHPUnit with coverage
               run: |
                   php bin/phpunit \
                     --coverage-html coverage-html \
                     --coverage-clover coverage.xml
 
-            # 8) Upload HTML coverage report
+            # 8) Upload HTML report
             - name: Upload coverage HTML
               uses: actions/upload-artifact@v4
               with:

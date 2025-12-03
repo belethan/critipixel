@@ -11,18 +11,18 @@ jobs:
 
         env:
             APP_ENV: test
-            DATABASE_URL: "sqlite:///tmp/critipixel_test.db"
+            DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
 
         steps:
-            # 1) Checkout
+            # 1) Checkout repository
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            # Debug structure
+            # 2) Debug workspace structure
             - name: Debug workspace
               run: pwd && ls -R .
 
-            # 2) Install PHP
+            # 3) Setup PHP 8.4
             - name: Setup PHP 8.4
               uses: shivammathur/setup-php@v2
               with:
@@ -30,30 +30,29 @@ jobs:
                   extensions: intl, mbstring, sqlite, pdo_sqlite
                   tools: composer:v2
 
-            # 3) Composer install
+            # 4) Install dependencies (without scripts)
             - name: Install dependencies (no scripts)
               run: composer install --no-interaction --no-progress --no-scripts
 
-            # 4) Create SQLite database file
-            - name: Prepare SQLite test file
+            # 5) Create SQLite database file inside workspace
+            - name: Create SQLite test database file
               run: |
-                  mkdir -p /tmp
-                  touch /tmp/critipixel_test.db
-                  chmod 777 /tmp
-                  chmod 777 /tmp/critipixel_test.db
-                  ls -l /tmp
+                  mkdir -p var
+                  touch var/test.db
+                  chmod 666 var/test.db
+                  ls -l var
 
-            # 5) Doctrine init
-            - name: Prepare SQLite database schema
+            # 6) Prepare SQLite schema and load fixtures
+            - name: Prepare SQLite database
               run: |
                   php bin/console doctrine:database:create --env=test --if-not-exists
                   php bin/console doctrine:schema:create --env=test
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
 
-            # 6) PHPStan
+            # 7) Run PHPStan
             - name: Run PHPStan
               run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
-            # 7) PHPUnit
+            # 8) Run PHPUnit
             - name: Run PHPUnit
               run: php bin/phpunit --testdox --colors=always
