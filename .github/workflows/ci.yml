@@ -14,15 +14,12 @@ jobs:
             DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
 
         steps:
-            # 1) Checkout repository
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            # 2) Debug workspace structure
             - name: Debug workspace
               run: pwd && ls -R .
 
-            # 3) Setup PHP 8.4
             - name: Setup PHP 8.4
               uses: shivammathur/setup-php@v2
               with:
@@ -30,11 +27,9 @@ jobs:
                   extensions: intl, mbstring, sqlite, pdo_sqlite
                   tools: composer:v2
 
-            # 4) Install dependencies (without scripts)
             - name: Install dependencies (no scripts)
               run: composer install --no-interaction --no-progress --no-scripts
 
-            # 5) Create SQLite database file inside workspace
             - name: Create SQLite test database file
               run: |
                   mkdir -p var
@@ -42,17 +37,13 @@ jobs:
                   chmod 666 var/test.db
                   ls -l var
 
-            # 6) Prepare SQLite schema and load fixtures
             - name: Prepare SQLite database
               run: |
-                  php bin/console doctrine:database:create --env=test --if-not-exists
                   php bin/console doctrine:schema:create --env=test
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
 
-            # 7) Run PHPStan
             - name: Run PHPStan
               run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
-            # 8) Run PHPUnit
             - name: Run PHPUnit
               run: php bin/phpunit --testdox --colors=always

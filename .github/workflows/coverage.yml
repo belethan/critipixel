@@ -14,16 +14,13 @@ jobs:
             DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
 
         steps:
-            # 1) Checkout repository
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            # 2) Debug workspace
             - name: Debug workspace
               run: pwd && ls -R .
 
-            # 3) Setup PHP with Xdebug
-            - name: Setup PHP
+            - name: Setup PHP with Xdebug
               uses: shivammathur/setup-php@v2
               with:
                   php-version: '8.4'
@@ -31,11 +28,9 @@ jobs:
                   extensions: intl, mbstring, sqlite, pdo_sqlite
                   tools: composer:v2
 
-            # 4) Install project dependencies
             - name: Install dependencies (no scripts)
               run: composer install --no-interaction --no-progress --no-scripts
 
-            # 5) Create SQLite test database
             - name: Create SQLite test database file
               run: |
                   mkdir -p var
@@ -43,28 +38,23 @@ jobs:
                   chmod 666 var/test.db
                   ls -l var
 
-            # 6) Prepare database schema + fixtures
             - name: Prepare SQLite test database
               run: |
-                  php bin/console doctrine:database:create --env=test --if-not-exists
                   php bin/console doctrine:schema:create --env=test
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
 
-            # 7) Run PHPUnit with coverage output
             - name: Run PHPUnit with coverage
               run: |
                   php bin/phpunit \
                     --coverage-html coverage-html \
                     --coverage-clover coverage.xml
 
-            # 8) Upload HTML report
             - name: Upload coverage HTML
               uses: actions/upload-artifact@v4
               with:
                   name: coverage-html
                   path: coverage-html/
 
-            # 9) Upload Clover XML report
             - name: Upload coverage Clover
               uses: actions/upload-artifact@v4
               with:
