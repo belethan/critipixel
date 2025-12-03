@@ -44,12 +44,11 @@ jobs:
               run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
             - name: Prepare test database (SQLite)
+              working-directory: ${{ github.workspace }}
               run: |
                     mkdir -p var/data
                     php bin/console doctrine:database:create --env=test --if-not-exists
                     php bin/console doctrine:migrations:migrate --env=test -n
-                working-directory: ${{ github.workspace }}
-
 
             - name: Run PHPUnit
               run: symfony php bin/phpunit --colors=always
