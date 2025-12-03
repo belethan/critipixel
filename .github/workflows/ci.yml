@@ -10,7 +10,6 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-
             - name: Checkout repository
               uses: actions/checkout@v4
 
@@ -25,24 +24,6 @@ jobs:
               working-directory: ${{ github.workspace }}/critipixel
               run: composer install --no-interaction --no-progress --no-scripts
 
-            - name: Debug version
-              working-directory: ${{ github.workspace }}/critipixel
-              run: php -v
-
-            - name: Debug folders before SQLite
-              working-directory: ${{ github.workspace }}/critipixel
-              run: |
-                  echo "PWD:"
-                  pwd
-                  echo "Listing project root:"
-                  ls -la
-                  echo "Listing var/:"
-                  ls -la var || true
-                  echo "Listing var/data:"
-                  ls -la var/data || true
-                  echo "DATABASE_URL:"
-                  php -r "echo getenv('DATABASE_URL');"
-
             - name: Run PHPStan
               working-directory: ${{ github.workspace }}/critipixel
               run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
@@ -51,7 +32,7 @@ jobs:
               working-directory: ${{ github.workspace }}/critipixel
               run: |
                   php bin/console doctrine:database:create --env=test --if-not-exists
-                  php bin/console doctrine:migrations:migrate --env=test -n
+                  php bin/console doctrine:schema:create --env=test
 
             - name: Run PHPUnit
               working-directory: ${{ github.workspace }}/critipixel
