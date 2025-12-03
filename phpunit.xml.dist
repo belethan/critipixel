@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
@@ -7,7 +6,7 @@
          colors="true">
 
     <!-- =========================== -->
-    <!-- TEST SUITES                 -->
+    <!-- TEST SUITES -->
     <!-- =========================== -->
     <testsuites>
         <testsuite name="Project Test Suite">
@@ -16,21 +15,22 @@
     </testsuites>
 
     <!-- =========================== -->
-    <!-- PHP / Symfony ENV VARS      -->
+    <!-- PHP / Symfony ENV VARS -->
     <!-- =========================== -->
     <php>
-        <server name="APP_ENV" value="test" />
-        <server name="APP_DEBUG" value="1" />
-        <server name="KERNEL_CLASS" value="App\Kernel" />
+        <server name="APP_ENV" value="test"/>
+        <server name="APP_DEBUG" value="1"/>
+        <server name="KERNEL_CLASS" value="App\Kernel"/>
 
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
-        <env name="SYMFONY_PHPUNIT_LOCALE" value="fr_FR" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+        <env name="SYMFONY_PHPUNIT_LOCALE" value="fr_FR"/>
 
-        <server name="SHELL_VERBOSITY" value="-1" />
+        <server name="SHELL_VERBOSITY" value="-1"/>
     </php>
 
     <!-- =========================== -->
-    <!-- COVERAGE (nouveau système)  -->
+    <!-- COVERAGE -->
+    <!-- compatible PHPUnit 10 -->
     <!-- =========================== -->
     <coverage>
         <include>

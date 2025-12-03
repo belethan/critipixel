@@ -11,7 +11,7 @@ jobs:
 
         env:
             APP_ENV: test
-            DATABASE_URL: "sqlite:///%cd%/var/data/test.db"
+            DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data/test.db"
 
         steps:
             - name: Checkout repository
@@ -31,14 +31,13 @@ jobs:
             - name: Install dependencies (no scripts)
               run: composer install --no-interaction --no-progress --no-scripts
 
-            - name: Prepare SQLite file
+            - name: Ensure SQLite DB exists
               run: |
-                  rm -f var/data/test.db
                   mkdir -p var/data
                   touch var/data/test.db
                   chmod -R 777 var/data
 
-            - name: Prepare SQLite schema + fixtures
+            - name: Prepare SQLite test database
               run: |
                   php bin/console doctrine:schema:create --env=test
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
@@ -46,8 +45,8 @@ jobs:
             - name: Run PHPUnit with coverage
               run: |
                   php bin/phpunit \
-                      --coverage-html coverage-html \
-                      --coverage-clover coverage.xml
+                    --coverage-html coverage-html \
+                    --coverage-clover coverage.xml
 
             - name: Upload coverage HTML
               uses: actions/upload-artifact@v4
