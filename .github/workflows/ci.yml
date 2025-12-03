@@ -9,6 +9,10 @@ jobs:
     tests:
         runs-on: ubuntu-latest
 
+        env:
+            DATABASE_URL: "sqlite:///tmp/critipixel_test.db"
+            APP_ENV: test
+
         steps:
 
             # 1) Télécharger le repository
