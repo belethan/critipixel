@@ -27,8 +27,8 @@ jobs:
             - name: Install Dependencies (no scripts)
               run: composer install --no-progress --no-interaction --no-scripts
 
-            - name: Run PHPStan
-              run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+            - name: Run PHPStan (force correct config)
+              run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
             - name: Create test database
               run: |
