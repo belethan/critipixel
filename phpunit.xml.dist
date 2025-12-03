@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
-         colors="true"
          cacheDirectory=".phpunit.cache"
-         failOnRisky="false"
-         failOnWarning="false"
->
+         colors="true">
+
     <!-- =========================== -->
-    <!--  TEST DIRECTORIES           -->
+    <!-- TEST SUITES                 -->
     <!-- =========================== -->
     <testsuites>
         <testsuite name="Project Test Suite">
@@ -18,48 +16,32 @@
     </testsuites>
 
     <!-- =========================== -->
-    <!--  PHP / Symfony ENV VARS     -->
+    <!-- PHP / Symfony ENV VARS      -->
     <!-- =========================== -->
     <php>
-        <!-- Toujours en mode test -->
         <server name="APP_ENV" value="test" />
-
-        <!-- TRES IMPORTANT POUR SYMFONY -->
+        <server name="APP_DEBUG" value="1" />
         <server name="KERNEL_CLASS" value="App\Kernel" />
 
-        <!-- Nécessaire pour éviter les messages de dépréciation -->
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
-
-        <!-- Localisation -->
         <env name="SYMFONY_PHPUNIT_LOCALE" value="fr_FR" />
 
-        <!-- Debug -->
         <server name="SHELL_VERBOSITY" value="-1" />
-
-        <!-- PHPUnit version -->
-        <server name="SYMFONY_PHPUNIT_VERSION" value="9.6" />
     </php>
 
     <!-- =========================== -->
-    <!--  CODE COVERAGE (optional)   -->
+    <!-- COVERAGE (nouveau système)  -->
     <!-- =========================== -->
-    <coverage processUncoveredFiles="true">
+    <coverage>
         <include>
-            <directory suffix=".php">src</directory>
+            <directory>src</directory>
         </include>
 
         <report>
-            <text outputFile="coverage.txt"/>
             <html outputDirectory="coverage-html"/>
             <clover outputFile="coverage.xml"/>
+            <text outputFile="coverage.txt"/>
         </report>
     </coverage>
-
-    <!-- =========================== -->
-    <!--  Symfony Test Listener      -->
-    <!-- =========================== -->
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
-    </listeners>
 
 </phpunit>
