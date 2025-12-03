@@ -1,0 +1,81 @@
+name: CI Symfony 7.3 (PHPUnit + PHPStan)
+
+on:
+    push:
+        branches:
+            - main
+            - dev
+            - devuser
+            - versbeta
+    pull_request:
+
+jobs:
+
+    tests:
+        runs-on: ubuntu-latest
+
+        steps:
+
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            # -------------------------
+            # Versions (PHP 8.4 stable)
+            # -------------------------
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+                  coverage: none
+                  extensions: intl, mbstring, pdo_mysql
+                  tools: composer:v2
+
+            # -------------------------
+            # Cache Composer
+            # -------------------------
+            - name: Get Composer Cache Directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache Composer
+              uses: actions/cache@v4
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: composer-${{ runner.os }}-
+
+            # -------------------------
+            # Installation dépendances
+            # -------------------------
+            - name: Install Dependencies
+              run: composer install --no-progress --no-interaction
+
+            # -------------------------
+            # Cache PHPStan
+            # -------------------------
+            - name: Cache PHPStan
+              uses: actions/cache@v4
+              with:
+                  path: var/cache/phpstan
+                  key: phpstan-${{ runner.os }}-${{ hashFiles('phpstan.neon') }}
+                  restore-keys: phpstan-${{ runner.os }}-
+
+            # -------------------------
+            # Running PHPStan
+            # -------------------------
+            - name: Run PHPStan
+              run: vendor/bin/phpstan analyse --no-progress
+
+            # -------------------------
+            # Set up database for PHPUnit
+            # -------------------------
+            - name: Create test database
+              run: |
+                  php bin/console doctrine:database:create --env=test
+                  php bin/console doctrine:migrations:migrate --env=test -n
+
+            # -------------------------
+            # Running PHPUnit
+            # -------------------------
+            - name: Run PHPUnit Tests
+              run: symfony php bin/phpunit --display-errors --colors=always
