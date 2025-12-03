@@ -19,10 +19,11 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
+            # Debug structure projet
             - name: Debug workspace
               run: ls -R ${{ github.workspace }}
 
-            # 2) Installer PHP 8.4 + extensions
+            # 2) Installer PHP 8.4 + extensions SQLite
             - name: Setup PHP 8.4
               uses: shivammathur/setup-php@v2
               with:
@@ -39,13 +40,21 @@ jobs:
               working-directory: ${{ github.workspace }}
               run: composer install --no-interaction --no-progress --no-scripts
 
-            # 5) Vérifier que PHPStan fonctionne
+            #  BLOC CRUCIAL → créer la base SQLite AVANT Doctrine
+            - name: Prepare SQLite file
+              run: |
+                  sudo mkdir -p /tmp
+                  sudo touch /tmp/critipixel_test.db
+                  sudo chmod 777 /tmp/critipixel_test.db
+                  ls -l /tmp/critipixel_test.db
+
+            # 5) Vérifier PHPStan
             - name: Run PHPStan
               working-directory: ${{ github.workspace }}
               run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
 
-            # 6) Préparer la base de test SQLite
-            - name: Prepare SQLite database
+            # 6) Préparer la base SQLite (schema + fixtures)
+            - name: Prepare SQLite schema + fixtures
               working-directory: ${{ github.workspace }}
               run: |
                   php bin/console doctrine:database:create --env=test --if-not-exists
@@ -53,6 +62,6 @@ jobs:
                   php bin/console doctrine:fixtures:load --env=test --no-interaction
 
             # 7) Lancer PHPUnit avec output détaillé
-            - name: Run PHPUnit (verbose)
+            - name: Run PHPUnit
               working-directory: ${{ github.workspace }}
-              run: php bin/phpunit --testdox --verbose --colors=always
+              run: php bin/phpunit --testdox --colors=always
