@@ -13,7 +13,6 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-
             - name: Checkout repository
               uses: actions/checkout@v4
 
@@ -25,8 +24,8 @@ jobs:
                   tools: composer:v2
                   coverage: none
 
-            - name: Install Composer dependencies
-              run: composer install --no-interaction --no-progress --ansi
+            - name: Install Dependencies (no scripts)
+              run: composer install --no-progress --no-interaction --no-scripts
 
             - name: Run PHPStan
               run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
