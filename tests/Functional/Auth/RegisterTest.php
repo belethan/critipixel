@@ -14,8 +14,21 @@ final class RegisterTest extends DatabaseTestCase
     {
         parent::setUp();
         $this->purgeUserTable();
+        $this->createDefaultUser();
     }
 
+    private function createDefaultUser(): void
+    {
+        $em = $this->getEntityManager();
+
+        $user = new User();
+        $user->setUsername('default');
+        $user->setEmail('default@example.com');
+        $user->setPlainPassword('Password123!');
+
+        $em->persist($user);
+        $em->flush();
+    }
     private function purgeUserTable(): void
     {
         $em = $this->getEntityManager();
