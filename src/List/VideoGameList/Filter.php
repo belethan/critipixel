@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace App\List\VideoGameList;
 
-use App\Model\Entity\Tag;
-
 final class Filter
 {
     /** @var array<int, string> */
     private array $tags = [];
 
-    /**
-     * @param Tag[] $tags
-     */
     public function __construct(
         private ?string $search = null,
     ) {

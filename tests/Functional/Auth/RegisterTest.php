@@ -10,7 +10,23 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class RegisterTest extends FunctionalTestCase
 {
-    /* Penser à supprimer le user : user@email.com avant exécuter le test */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $em = $this->getEntityManager();
+
+        // Compatible SQLite + MySQL : supprime tous les users
+        $em->createQuery('DELETE FROM App\Entity\User')->execute();
+
+        // Remise de l'AUTO_INCREMENT (si MySQL)
+        $connection = $em->getConnection();
+        if ('mysql' === $connection->getDatabasePlatform()->getName()) {
+            $connection->executeStatement('ALTER TABLE user AUTO_INCREMENT = 1;');
+        }
+    }
+
+    /* Penser à supprimer, user : user@email.com avant exécuter le test */
     public function testRegistrationSucceeds(): void
     {
         $formData = self::getFormData();
@@ -135,7 +151,7 @@ final class RegisterTest extends FunctionalTestCase
 
         foreach ($overrideData as $key => $value) {
             // Exemple : "register[username]"
-            if (preg_match('/register\[(.+)\]/', $key, $m)) {
+            if (preg_match('/register\[(.+)]/', $key, $m)) {
                 $field = $m[1];
                 $data['register'][$field] = $value;
             }

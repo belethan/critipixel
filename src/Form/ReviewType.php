@@ -13,6 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @template TData of object
+ *
  * @extends AbstractType<TData>
  */
 final class ReviewType extends AbstractType
