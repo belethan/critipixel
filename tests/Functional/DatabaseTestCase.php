@@ -2,35 +2,49 @@
 
 namespace App\Tests\Functional;
 
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 
-abstract class DatabaseTestCase extends WebTestCase
+/**
+ * Classe de base pour les tests fonctionnels CritiPixel.
+ *
+ * Elle :
+ * - étend FunctionalTestCase pour garder les helpers HTTP (get(), submitForm(), …)
+ * - purge UNIQUEMENT la table "user"
+ * - évite de casser les tests VideoGame liés aux fixtures
+ * - reste compatible MySQL + SQLite (CI GitHub)
+ */
+abstract class DatabaseTestCase extends FunctionalTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->purgeDatabase();
+        $this->purgeUserTable(); // on purge seulement user, pas toute la base !
     }
 
-    protected function purgeDatabase(): void
+    /**
+     * Purge uniquement la table user pour éviter les collisions dans RegisterTest.
+     * Compatible SQLite, MySQL et GitHub Actions (coverage).
+     */
+    private function purgeUserTable(): void
     {
-        // Récupère l'EntityManager du conteneur
-        $em = static::getContainer()->get('doctrine')->getManager();
+        $em = $this->getEntityManager();
+        $conn = $em->getConnection();
+        $platform = $conn->getDatabasePlatform()->getName();
 
-        // Purger toutes les tables Doctrine
-        $purger = new ORMPurger($em);
-
-        // Obligatoire pour SQLite, sinon TRUNCATE sera rejeté
-        $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
-
-        $purger->purge();
+        if ($platform === 'sqlite') {
+            // SQLite ne supporte pas TRUNCATE + FK checks
+            $conn->executeStatement('DELETE FROM user;');
+            $conn->executeStatement('DELETE FROM sqlite_sequence WHERE name="user";');
+        } else {
+            // MySQL / MariaDB
+            $conn->executeStatement('SET FOREIGN_KEY_CHECKS = 0;');
+            $conn->executeStatement('TRUNCATE TABLE user;');
+            $conn->executeStatement('SET FOREIGN_KEY_CHECKS = 1;');
+        }
     }
 
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManagerInterface
     {
         return static::getContainer()->get('doctrine')->getManager();
     }
 }
-
