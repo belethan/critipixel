@@ -11,25 +11,27 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class RegisterTest extends FunctionalTestCase
 {
     /* Penser à supprimer le user : user@email.com avant exécuter le test */
-    public function testThatRegistrationShouldSucceeded(): void
+    public function testRegistrationSucceeds(): void
     {
+        $formData = self::getFormData();
+        $expectedEmail = $formData['register']['email'];
+        $expectedUsername = $formData['register']['username'];
+
         $this->get('/auth/register');
 
-        $this->client->submitForm('S\'inscrire', self::getFormData());
+        $this->client->submitForm('S\'inscrire', $formData);
 
         self::assertResponseRedirects('/auth/login');
 
         $user = $this->getEntityManager()->getRepository(User::class)->findOneBy([
-            'email' => 'user@email.com',
+            'email' => $expectedEmail,
         ]);
 
         self::assertNotNull($user);
-        self::assertSame('username', $user->getUsername());
+        self::assertSame($expectedUsername, $user->getUsername());
     }
 
-    /**
-     * @dataProvider provideInvalidFormData
-     */
+    #[DataProvider('provideInvalidFormData')]
     #[DataProvider('provideInvalidFormData')]
     public function testThatRegistrationShouldFailed(array $formData): void
     {
