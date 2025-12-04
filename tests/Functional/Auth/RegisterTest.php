@@ -32,7 +32,6 @@ final class RegisterTest extends FunctionalTestCase
     }
 
     #[DataProvider('provideInvalidFormData')]
-    #[DataProvider('provideInvalidFormData')]
     public function testThatRegistrationShouldFailed(array $formData): void
     {
         // Préparer les données existantes pour les tests d'unicité
@@ -75,59 +74,53 @@ final class RegisterTest extends FunctionalTestCase
     // La fonction provideInvalidFormData est utilisée par PHPUNIT en lisant attribut DataProvider dans le test
     public static function provideInvalidFormData(): iterable
     {
-        /* yield 'empty username' => self::getFormData(['register[username]' => '']);
-         yield 'non unique username' => self::getFormData(['register[username]' => 'user+1']);
-         yield 'too long username' => self::getFormData(['register[username]' => 'Lorem ipsum dolor sit amet orci aliquam']);
-         yield 'empty email' => self::getFormData(['register[email]' => '']);
-         yield 'non unique email' => self::getFormData(['register[email]' => 'user+1@email.com']);
-         yield 'invalid email' => self::getFormData(['register[email]' => 'fail']);*/
-        yield 'empty username' => [[
-            'register' => [
-                'username' => '',
-                'email' => 'user@email.com',
-                'plainPassword' => 'SuperPassword123!',
+        yield 'empty username' => [
+            [
+                'register[username]' => '',
+                'register[email]' => 'user@email.com',
+                'register[plainPassword]' => 'SuperPassword123!',
             ],
-        ]];
+        ];
 
-        yield 'non unique username' => [[
-            'register' => [
-                'username' => 'user+1',
-                'email' => 'user@email.com',
-                'plainPassword' => 'SuperPassword123!',
+        yield 'non unique username' => [
+            [
+                'register[username]' => 'user+1',
+                'register[email]' => 'user@email.com',
+                'register[plainPassword]' => 'SuperPassword123!',
             ],
-        ]];
+        ];
 
-        yield 'too long username' => [[
-            'register' => [
-                'username' => 'Lorem ipsum dolor sit amet orci aliquam',
-                'email' => 'user@email.com',
-                'plainPassword' => 'SuperPassword123!',
+        yield 'too long username' => [
+            [
+                'register[username]' => 'Lorem ipsum dolor sit amet orci aliquam',
+                'register[email]' => 'user@email.com',
+                'register[plainPassword]' => 'SuperPassword123!',
             ],
-        ]];
+        ];
 
-        yield 'empty email' => [[
-            'register' => [
-                'username' => 'username',
-                'email' => '',
-                'plainPassword' => 'SuperPassword123!',
+        yield 'empty email' => [
+            [
+                'register[username]' => 'username',
+                'register[email]' => '',
+                'register[plainPassword]' => 'SuperPassword123!',
             ],
-        ]];
+        ];
 
-        yield 'non unique email' => [[
-            'register' => [
-                'username' => 'username',
-                'email' => 'user+1@email.com',
-                'plainPassword' => 'SuperPassword123!',
+        yield 'non unique email' => [
+            [
+                'register[username]' => 'username',
+                'register[email]' => 'user+1@email.com',
+                'register[plainPassword]' => 'SuperPassword123!',
             ],
-        ]];
+        ];
 
-        yield 'invalid email' => [[
-            'register' => [
-                'username' => 'username',
-                'email' => 'fail',
-                'plainPassword' => 'SuperPassword123!',
+        yield 'invalid email' => [
+            [
+                'register[username]' => 'username',
+                'register[email]' => 'fail',
+                'register[plainPassword]' => 'SuperPassword123!',
             ],
-        ]];
+        ];
     }
 
     public static function getFormData(array $overrideData = []): array
