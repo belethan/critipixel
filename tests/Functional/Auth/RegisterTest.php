@@ -5,33 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Auth;
 
 use App\Model\Entity\User;
+use App\Tests\Functional\DatabaseTestCase;
 use App\Tests\Functional\FunctionalTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-final class RegisterTest extends FunctionalTestCase
+final class RegisterTest extends DatabaseTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $em = $this->getEntityManager();
-        $connection = $em->getConnection();
-        $platform = $connection->getDatabasePlatform()->getName();
-
-        if ($platform === 'sqlite') {
-            // SQLite ne supporte pas TRUNCATE ni DELETE FROM sans WHERE
-            $connection->executeStatement('DELETE FROM user;');
-            $connection->executeStatement('DELETE FROM sqlite_sequence WHERE name="user";'); // reset auto-incrément
-        } else {
-            // MySQL + MariaDB
-            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0;');
-            $connection->executeStatement('TRUNCATE TABLE user;');
-            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1;');
-        }
-    }
-
-
     /* Penser à supprimer, user : user@email.com avant exécuter le test */
+    #[DataProvider('provideInvalidFormData')]
     public function testRegistrationSucceeds(): void
     {
         $formData = self::getFormData();
