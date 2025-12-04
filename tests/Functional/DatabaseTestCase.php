@@ -19,6 +19,7 @@ abstract class DatabaseTestCase extends FunctionalTestCase
     {
         parent::setUp();
         $this->purgeUserTable(); // on purge seulement user, pas toute la base !
+        $this->createDefaultUser();
     }
 
     /**
@@ -42,7 +43,18 @@ abstract class DatabaseTestCase extends FunctionalTestCase
             $conn->executeStatement('SET FOREIGN_KEY_CHECKS = 1;');
         }
     }
+    private function createDefaultUser(): void
+    {
+        $em = $this->getEntityManager();
 
+        $user = new User();
+        $user->setUsername('default');
+        $user->setEmail('default@example.com');
+        $user->setPlainPassword('Password123!');
+
+        $em->persist($user);
+        $em->flush();
+    }
     protected function getEntityManager(): EntityManagerInterface
     {
         return static::getContainer()->get('doctrine')->getManager();
