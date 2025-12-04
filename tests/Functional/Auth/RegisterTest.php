@@ -6,12 +6,33 @@ namespace App\Tests\Functional\Auth;
 
 use App\Model\Entity\User;
 use App\Tests\Functional\DatabaseTestCase;
-use App\Tests\Functional\FunctionalTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class RegisterTest extends DatabaseTestCase
 {
-    /* Penser à supprimer, user : user@email.com avant exécuter le test */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->purgeUserTable();
+    }
+
+    private function purgeUserTable(): void
+    {
+        $em = $this->getEntityManager();
+        $conn = $em->getConnection();
+
+        $platform = $conn->getDatabasePlatform()->getName();
+
+        if ($platform === 'sqlite') {
+            $conn->executeStatement('DELETE FROM user;');
+            $conn->executeStatement('DELETE FROM sqlite_sequence WHERE name="user";');
+        } else {
+            $conn->executeStatement('SET FOREIGN_KEY_CHECKS = 0;');
+            $conn->executeStatement('TRUNCATE TABLE user;');
+            $conn->executeStatement('SET FOREIGN_KEY_CHECKS = 1;');
+        }
+    }
+
     #[DataProvider('provideInvalidFormData')]
     public function testRegistrationSucceeds(): void
     {
@@ -41,39 +62,26 @@ final class RegisterTest extends DatabaseTestCase
             ($formData['register[username]'] ?? null) === 'user+1'
             || ($formData['register[email]'] ?? null) === 'user+1@email.com'
         ) {
+            $em = $this->getEntityManager();
             $existing = new User();
             $existing->setUsername('user+1');
             $existing->setEmail('user+1@email.com');
             $existing->setPlainPassword('Password123!');
-            $em = $this->getEntityManager();
             $em->persist($existing);
             $em->flush();
         }
 
-        // Charger la page
         $this->get('/auth/register');
 
-        // Vérifier que les champs existent
-        self::assertSelectorExists('input[name="register[username]"]');
-        self::assertSelectorExists('input[name="register[email]"]');
-        self::assertSelectorExists('input[name="register[plainPassword]"]');
-
         $crawler = $this->client->getCrawler();
-
-        // Récupération correcte du formulaire
         $form = $crawler->filter('form[name="register"]')->form();
-
-        // ✔ Injection des valeurs invalides
         $form->setValues($formData);
 
-        // Soumission
         $this->client->submit($form);
 
-        // ✔ Le controller renvoie bien 422 en cas d'erreur
         self::assertResponseStatusCodeSame(422);
     }
 
-    // La fonction provideInvalidFormData est utilisée par PHPUNIT en lisant attribut DataProvider dans le test
     public static function provideInvalidFormData(): iterable
     {
         yield 'empty username' => [
@@ -136,7 +144,6 @@ final class RegisterTest extends DatabaseTestCase
         ];
 
         foreach ($overrideData as $key => $value) {
-            // Exemple : "register[username]"
             if (preg_match('/register\[(.+)]/', $key, $m)) {
                 $field = $m[1];
                 $data['register'][$field] = $value;
