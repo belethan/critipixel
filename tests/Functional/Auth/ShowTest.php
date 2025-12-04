@@ -27,34 +27,40 @@ final class ShowTest extends WebTestBase
     // attention un avis par user par jeu
     public function testPosterUnAvis(): void
     {
-        // Connexion d'un utilisateur présent dans les fixtures
+        // Utilisateur connu
         $user = $this->em->getRepository(User::class)->findOneBy([
             'email' => 'user+2@email.com',
         ]);
         self::assertNotNull($user);
         $this->client->loginUser($user);
 
-        // Récupération d’un jeu réel
+        // Jeu existant
         $game = $this->em->getRepository(VideoGame::class)->findOneBy([]);
         self::assertNotNull($game);
 
-        // Aller sur la page du jeu
+        // Page du jeu
         $this->get('/'.$game->getSlug());
         self::assertResponseIsSuccessful();
 
-        // Soumission du formulaire
+        // Soumission de l'avis
         $this->submit('Poster', [
             'review[rating]' => 4,
             'review[comment]' => 'Mon commentaire',
         ]);
 
-        // Redirection après succès
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
         $this->client->followRedirect();
 
-        // Vérification affichage dans les avis
-        self::assertSelectorTextContains('div.list-group-item:last-child p', 'Mon commentaire');
-        self::assertSelectorTextContains('div.list-group-item:last-child span.value', '4');
+        // 🔥 Vérification PROPRE : en base
+        $review = $this->em->getRepository(\App\Model\Entity\Review::class)->findOneBy([
+            'user' => $user,
+            'videoGame' => $game,
+        ]);
+
+        self::assertNotNull($review);
+        self::assertSame(4, $review->getRating());
+        self::assertSame('Mon commentaire', $review->getComment());
     }
+
 }
