@@ -15,16 +15,21 @@ final class RegisterTest extends FunctionalTestCase
         parent::setUp();
 
         $em = $this->getEntityManager();
-
-        // Compatible SQLite + MySQL : supprime tous les users
-        $em->createQuery('DELETE FROM App\Entity\User')->execute();
-
-        // Remise de l'AUTO_INCREMENT (si MySQL)
         $connection = $em->getConnection();
-        if ('mysql' === $connection->getDatabasePlatform()->getName()) {
-            $connection->executeStatement('ALTER TABLE user AUTO_INCREMENT = 1;');
+        $platform = $connection->getDatabasePlatform()->getName();
+
+        if ($platform === 'sqlite') {
+            // SQLite ne supporte pas TRUNCATE ni DELETE FROM sans WHERE
+            $connection->executeStatement('DELETE FROM user;');
+            $connection->executeStatement('DELETE FROM sqlite_sequence WHERE name="user";'); // reset auto-incrément
+        } else {
+            // MySQL + MariaDB
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0;');
+            $connection->executeStatement('TRUNCATE TABLE user;');
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1;');
         }
     }
+
 
     /* Penser à supprimer, user : user@email.com avant exécuter le test */
     public function testRegistrationSucceeds(): void
