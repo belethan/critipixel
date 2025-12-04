@@ -12,28 +12,16 @@ final class RegisterTest extends DatabaseTestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
+        parent::setUp(); // ← charge toutes tes fixtures
+
+        // Purge uniquement la table user pour tester l'inscription
         $this->purgeUserTable();
-        $this->createDefaultUser();
     }
 
-    private function createDefaultUser(): void
-    {
-        $em = $this->getEntityManager();
-
-        $user = new User();
-        $user->setUsername('default');
-        $user->setEmail('default@example.com');
-        $user->setPlainPassword('Password123!');
-
-        $em->persist($user);
-        $em->flush();
-    }
     private function purgeUserTable(): void
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
-
         $platform = $conn->getDatabasePlatform()->getName();
 
         if ($platform === 'sqlite') {
@@ -46,7 +34,10 @@ final class RegisterTest extends DatabaseTestCase
         }
     }
 
-    #[DataProvider('provideInvalidFormData')]
+    // ---------------------------------------------------------
+    // TEST D'INSCRIPTION RÉUSSIE
+    // ---------------------------------------------------------
+
     public function testRegistrationSucceeds(): void
     {
         $formData = self::getFormData();
@@ -55,22 +46,25 @@ final class RegisterTest extends DatabaseTestCase
 
         $this->get('/auth/register');
 
-        $this->client->submitForm('S\'inscrire', $formData);
+        $this->client->submitForm("S'inscrire", $formData);
 
         self::assertResponseRedirects('/auth/login');
 
-        $user = $this->getEntityManager()->getRepository(User::class)->findOneBy([
-            'email' => $expectedEmail,
-        ]);
+        $user = $this->getEntityManager()->getRepository(User::class)
+            ->findOneBy(['email' => $expectedEmail]);
 
         self::assertNotNull($user);
         self::assertSame($expectedUsername, $user->getUsername());
     }
 
+    // ---------------------------------------------------------
+    // TESTS D'ÉCHEC
+    // ---------------------------------------------------------
+
     #[DataProvider('provideInvalidFormData')]
     public function testThatRegistrationShouldFailed(array $formData): void
     {
-        // Préparer les données existantes pour les tests d'unicité
+        // Préparer les données existantes pour tester l'unicité
         if (
             ($formData['register[username]'] ?? null) === 'user+1'
             || ($formData['register[email]'] ?? null) === 'user+1@email.com'
