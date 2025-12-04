@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 
@@ -33,7 +34,7 @@ class Review
     #[NotNull]
     #[Range(min: 1, max: 5)]
     #[Column]
-    private ?int $rating;
+    private ?int $rating = null;
 
     #[Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
@@ -60,11 +61,11 @@ class Review
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(?UserInterface $user): void
     {
-        $this->user = $user;
-
-        return $this;
+        if ($user instanceof User) {
+            $this->user = $user;
+        }
     }
 
     public function getRating(): int

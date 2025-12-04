@@ -11,6 +11,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @template TData of object
+ * @extends AbstractType<TData>
+ */
 final class ReviewType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void

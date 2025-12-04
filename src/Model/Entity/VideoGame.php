@@ -232,7 +232,9 @@ class VideoGame
     /* ============================================================
        TAGS (ManyToMany)
        ============================================================ */
-
+    /**
+     * @return Collection<int, Tag>
+     */
     public function getTags(): Collection
     {
         return $this->tags;

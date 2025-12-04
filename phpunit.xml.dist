@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
-         bootstrap="tests/bootstrap.php"
-         cacheDirectory=".phpunit.cache"
-         colors="true">
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+    bootstrap="tests/bootstrap.php"
+    cacheDirectory=".phpunit.cache"
+    colors="true"
+>
 
     <!-- =========================== -->
-    <!-- TEST SUITES -->
+    <!--         TEST SUITES         -->
     <!-- =========================== -->
     <testsuites>
         <testsuite name="Project Test Suite">
@@ -15,33 +17,57 @@
     </testsuites>
 
     <!-- =========================== -->
-    <!-- PHP / Symfony ENV VARS -->
+    <!--       ENV & SERVER VARS     -->
     <!-- =========================== -->
     <php>
+
+        <!-- Symfony ne peut PAS fonctionner sans APP_ENV -->
         <server name="APP_ENV" value="test"/>
+
+        <!-- Debug des tests -->
         <server name="APP_DEBUG" value="1"/>
+
+        <!-- Kernel requis sinon Symfony plante -->
         <server name="KERNEL_CLASS" value="App\Kernel"/>
 
+        <!-- SECRET nécessaire pour les tests -->
+        <server name="APP_SECRET" value="test_secret_key_123"/>
+
+        <!-- CI & local → désactivation des dépréciations -->
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+
+        <!-- Localisation -->
         <env name="SYMFONY_PHPUNIT_LOCALE" value="fr_FR"/>
 
+        <!-- Silence PHPUnit -->
         <server name="SHELL_VERBOSITY" value="-1"/>
+
+        <!-- IMPORTANT :
+             Ce fichier NE définit PAS DATABASE_URL.
+             Ce sont :
+             • .env → MySQL en local
+             • .env.test → SQLite en CI
+        -->
     </php>
 
     <!-- =========================== -->
-    <!-- COVERAGE -->
-    <!-- compatible PHPUnit 10 -->
+    <!--          COVERAGE           -->
     <!-- =========================== -->
     <coverage>
-        <include>
-            <directory>src</directory>
-        </include>
-
         <report>
             <html outputDirectory="coverage-html"/>
             <clover outputFile="coverage.xml"/>
             <text outputFile="coverage.txt"/>
         </report>
     </coverage>
+
+    <!-- =========================== -->
+    <!--            SOURCE           -->
+    <!-- =========================== -->
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
 
 </phpunit>
